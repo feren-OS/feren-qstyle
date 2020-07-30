@@ -1,4 +1,4 @@
-adwaita-qt
+feren-qt
 ==========
 
 A native style to bend Qt4 and Qt5 applications to look like they belong into GNOME Shell.
@@ -23,4 +23,4 @@ make install
 
 ## Usage
 
-After install, you'll be able to either set the theme as your default via your DE's tools (like `systemsettings` or `qt-config`) or start your qt applications with the `-style adwaita` parameter.
+After install, you'll be able to either set the theme as your default via your DE's tools (like `systemsettings` or `qt-config`) or start your qt applications with the `-style feren` parameter.

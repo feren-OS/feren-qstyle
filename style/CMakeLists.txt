@@ -1,40 +1,40 @@
 
-configure_file(config-adwaita.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-adwaita.h )
+configure_file(config-feren.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-feren.h )
 
-set(Adwaita_SRCS
-    animations/adwaitaanimation.cpp
-    animations/adwaitaanimations.cpp
-    animations/adwaitaanimationdata.cpp
-    animations/adwaitabaseengine.cpp
-    animations/adwaitabusyindicatordata.cpp
-    animations/adwaitabusyindicatorengine.cpp
-    animations/adwaitadialdata.cpp
-    animations/adwaitadialengine.cpp
-    animations/adwaitaenabledata.cpp
-    animations/adwaitagenericdata.cpp
-    animations/adwaitaheaderviewdata.cpp
-    animations/adwaitaheaderviewengine.cpp
-    animations/adwaitascrollbardata.cpp
-    animations/adwaitascrollbarengine.cpp
-    animations/adwaitaspinboxengine.cpp
-    animations/adwaitaspinboxdata.cpp
-    animations/adwaitastackedwidgetdata.cpp
-    animations/adwaitastackedwidgetengine.cpp
-    animations/adwaitatabbarengine.cpp
-    animations/adwaitatabbardata.cpp
-    animations/adwaitatoolboxengine.cpp
-    animations/adwaitatransitiondata.cpp
-    animations/adwaitatransitionwidget.cpp
-    animations/adwaitawidgetstateengine.cpp
-    animations/adwaitawidgetstatedata.cpp
-    debug/adwaitawidgetexplorer.cpp
-    adwaitaaddeventfilter.cpp
-    adwaitahelper.cpp
-    adwaitamnemonics.cpp
-    adwaitasplitterproxy.cpp
-    adwaitastyle.cpp
-    adwaitastyleplugin.cpp
-    adwaitawindowmanager.cpp
+set(Feren_SRCS
+    animations/ferenanimation.cpp
+    animations/ferenanimations.cpp
+    animations/ferenanimationdata.cpp
+    animations/ferenbaseengine.cpp
+    animations/ferenbusyindicatordata.cpp
+    animations/ferenbusyindicatorengine.cpp
+    animations/ferendialdata.cpp
+    animations/ferendialengine.cpp
+    animations/ferenenabledata.cpp
+    animations/ferengenericdata.cpp
+    animations/ferenheaderviewdata.cpp
+    animations/ferenheaderviewengine.cpp
+    animations/ferenscrollbardata.cpp
+    animations/ferenscrollbarengine.cpp
+    animations/ferenspinboxengine.cpp
+    animations/ferenspinboxdata.cpp
+    animations/ferenstackedwidgetdata.cpp
+    animations/ferenstackedwidgetengine.cpp
+    animations/ferentabbarengine.cpp
+    animations/ferentabbardata.cpp
+    animations/ferentoolboxengine.cpp
+    animations/ferentransitiondata.cpp
+    animations/ferentransitionwidget.cpp
+    animations/ferenwidgetstateengine.cpp
+    animations/ferenwidgetstatedata.cpp
+    debug/ferenwidgetexplorer.cpp
+    ferenaddeventfilter.cpp
+    ferenhelper.cpp
+    ferenmnemonics.cpp
+    ferensplitterproxy.cpp
+    ferenstyle.cpp
+    ferenstyleplugin.cpp
+    ferenwindowmanager.cpp
 )
 add_definitions(-DQT_PLUGIN)
 
@@ -44,20 +44,20 @@ endif()
 
 include_directories(
     ${QT_INCLUDES}
-    ${CMAKE_CURRENT_BINARY_DIR} # for adwaita-config.h
+    ${CMAKE_CURRENT_BINARY_DIR} # for feren-config.h
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/animations/
     ${CMAKE_CURRENT_SOURCE_DIR}/debug/
 )
 
-set(LIBRARY_NAME "adwaita-qt${QT_VERSION_NUMBER}")
+set(LIBRARY_NAME "feren-qt${QT_VERSION_NUMBER}")
 
-add_library(${LIBRARY_NAME} MODULE ${Adwaita_SRCS})
+add_library(${LIBRARY_NAME} MODULE ${Feren_SRCS})
 target_link_libraries(${LIBRARY_NAME} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDBUS_LIBRARY})
 set_target_properties(${LIBRARY_NAME} PROPERTIES
     LINK_FLAGS "-Wl,--no-undefined"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    OUTPUT_NAME "adwaita"
+    OUTPUT_NAME "feren"
     PREFIX "")
 
 install(TARGETS ${LIBRARY_NAME} DESTINATION "${QT_PLUGINS_DIR}/styles")

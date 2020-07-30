@@ -1,0 +1,5 @@
+[Misc]
+Name=Feren
+Comment=Qt widget style for Feren OS
+[KDE]
+WidgetStyle=Feren

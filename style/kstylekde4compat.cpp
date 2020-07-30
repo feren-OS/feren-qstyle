@@ -18,7 +18,7 @@
  *************************************************************************/
 
 #include "kstylekde4compat.h"
-#include "adwaita.h"
+#include "feren.h"
 
 #include <QToolBar>
 
@@ -79,13 +79,13 @@ int KStyleKDE4Compat::styleHint(StyleHint hint, const QStyleOption *option, cons
 
     switch (hint) {
     case SH_ItemView_ActivateItemOnSingleClick:
-        return Adwaita::Settings::SingleClick;
+        return Feren::Settings::SingleClick;
     case SH_DialogButtonBox_ButtonsHaveIcons:
-        return Adwaita::Settings::ShowIconsOnPushButtons;
+        return Feren::Settings::ShowIconsOnPushButtons;
     case SH_ItemView_ArrowKeysNavigateIntoChildren:
         return true;
     case SH_ToolButtonStyle:
-        return Adwaita::Settings::ToolButtonStyle;
+        return Feren::Settings::ToolButtonStyle;
     default:
         break;
     };

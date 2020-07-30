@@ -1,4 +1,4 @@
-project(Adwaita)
+project(Feren)
 
 cmake_minimum_required(VERSION 2.8.11)
 
@@ -39,7 +39,7 @@ if (NOT THEME_INSTALL_DIR)
     set (THEME_INSTALL_DIR "${DATA_INSTALL_DIR}/themes")
 endif()
 
-set(ADWAITA_THEME_DIR "${THEME_INSTALL_DIR}/Adwaita/qt")
+set(ADWAITA_THEME_DIR "${THEME_INSTALL_DIR}/Feren/qt")
 
 option(BUILD_EXAMPLE "Build an example widget factory app" OFF)
 if (BUILD_EXAMPLE)
