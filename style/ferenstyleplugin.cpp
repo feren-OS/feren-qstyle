@@ -37,10 +37,6 @@ namespace Feren
         {
             return new Style(false);
         }
-        if ( key.toLower() == QStringLiteral( "feren-dark") )
-        {
-            return new Style(true);
-        }
         return nullptr;
     }
 
@@ -51,6 +47,6 @@ namespace Feren
 
     //_________________________________________________
     QStringList StylePlugin::keys() const
-    { return QStringList() << QStringLiteral( "Feren" ) << QStringLiteral( "Feren-Dark" ); }
+    { return QStringList() << QStringLiteral( "Feren" ); }
 
 }
