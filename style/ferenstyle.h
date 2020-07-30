@@ -91,11 +91,6 @@ public:
     //* widget unpolishing
     virtual void unpolish(QWidget *widget);
 
-    //* palette polishing
-    virtual void polish(QPalette &palette);
-
-    virtual QPalette standardPalette() const;
-
     //* polish scrollarea
     void polishScrollArea(QAbstractScrollArea *scrollArea);
 

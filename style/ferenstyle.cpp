@@ -240,20 +240,21 @@ Style::Style(bool dark)
     // use DBus connection to update on feren configuration change
     QDBusConnection dbus = QDBusConnection::sessionBus();
     dbus.connect(QString(),
-                 QStringLiteral("/FerenStyle"),
-                 QStringLiteral("org.kde.Feren.Style"),
-                 QStringLiteral("reparseConfiguration"), this, SLOT(configurationChanged()));
+            QStringLiteral( "/BreezeStyle" ),
+            QStringLiteral( "org.kde.Breeze.Style" ),
+            QStringLiteral( "reparseConfiguration" ), this, SLOT(configurationChanged()));
 
     dbus.connect(QString(),
-                 QStringLiteral("/FerenDecoration"),
-                 QStringLiteral("org.kde.Feren.Style"),
-                 QStringLiteral("reparseConfiguration"), this, SLOT(configurationChanged()));
+            QStringLiteral( "/BreezeStyle" ),
+            QStringLiteral( "org.kde.Breeze.Style" ),
+            QStringLiteral( "reparseConfiguration" ), this, SLOT(configurationChanged()));
 
     // Detect if running under KDE, if so set menus, etc, to have translucent background.
     // For GNOME desktop, dont want translucent backgrounds otherwise no menu shadow is drawn.
     _isKDE = qgetenv("XDG_CURRENT_DESKTOP").toLower() == "kde";
     _isGNOME = qgetenv("XDG_CURRENT_DESKTOP").toLower() == "gnome";
 
+    connect(qApp, &QApplication::paletteChanged, this, &Style::configurationChanged);
     // call the slot directly; this initial call will set up things that also
     // need to be reset when the system palette changes
     loadConfiguration();
@@ -518,16 +519,6 @@ void Style::unpolish(QWidget *widget)
     }
 
     ParentStyleClass::unpolish(widget);
-}
-
-void Style::polish(QPalette &palette)
-{
-    palette = _helper->palette(_dark);
-}
-
-QPalette Style::standardPalette() const
-{
-    return _helper->palette(_dark);
 }
 
 //______________________________________________________________
@@ -1622,6 +1613,9 @@ QIcon Style::standardIconImplementation(StandardPixmap standardPixmap, const QSt
 //_____________________________________________________________________
 void Style::loadConfiguration()
 {
+    // load the palette
+    _helper->loadConfig();
+    
     // reinitialize engines
     _animations->setupEngines();
     _windowManager->initialize();
@@ -4095,7 +4089,7 @@ bool Style::drawIndicatorToolBarHandlePrimitive(const QStyleOption *option, QPai
     bool separatorIsVertical(state & State_Horizontal);
 
     // define color and render
-    QColor color(_helper->separatorColor(palette, _dark));
+    QColor color(_helper->separatorColor());
     if (separatorIsVertical) {
         rect.setWidth(Metrics::ToolBar_HandleWidth);
         rect = centerRect(option->rect, rect.size());
@@ -4138,7 +4132,7 @@ bool Style::drawIndicatorToolBarSeparatorPrimitive(const QStyleOption *option, Q
     bool separatorIsVertical(state & State_Horizontal);
 
     // define color and render
-    QColor color(_helper->separatorColor(palette, _dark));
+    QColor color(_helper->separatorColor());
     _helper->renderSeparator(painter, rect, color, separatorIsVertical);
 
     return true;
@@ -4717,7 +4711,7 @@ bool Style::drawMenuItemControl(const QStyleOption *option, QPainter *painter, c
     if (menuItemOption->menuItemType == QStyleOptionMenuItem::Separator) {
         // normal separator
         if (menuItemOption->text.isEmpty() && menuItemOption->icon.isNull()) {
-            QColor color(_helper->separatorColor(palette, _dark));
+            QColor color(_helper->separatorColor());
             _helper->renderSeparator(painter, rect, color);
             return true;
         } else {
@@ -5243,7 +5237,7 @@ bool Style::drawShapedFrameControl(const QStyleOption *option, QPainter *painter
     case QFrame::HLine:
     case QFrame::VLine: {
         const QRect &rect(option->rect);
-        QColor color(_helper->separatorColor(option->palette, _dark));
+        QColor color(_helper->separatorColor());
         bool isVertical(frameOpt->frameShape == QFrame::VLine);
         _helper->renderSeparator(painter, rect, color, isVertical);
         return true;
@@ -6252,7 +6246,7 @@ bool Style::drawSliderComplexControl(const QStyleOptionComplex *option, QPainter
             }
 
             // colors
-            QColor base(_helper->separatorColor(palette, _dark));
+            QColor base(_helper->separatorColor());
 
             while (current <= sliderOption->maximum) {
                 // adjust color
@@ -6704,7 +6698,7 @@ void Style::renderMenuTitle(const QStyleOptionToolButton *option, QPainter *pain
 {
     // render a separator at the bottom
     const QPalette &palette(option->palette);
-    QColor color(_helper->separatorColor(palette, _dark));
+    QColor color(_helper->separatorColor());
     _helper->renderSeparator(painter, QRect(option->rect.bottomLeft() - QPoint(0, Metrics::MenuItem_MarginWidth), QSize(option->rect.width(), 1)), color);
 
     // render text in the center of the rect

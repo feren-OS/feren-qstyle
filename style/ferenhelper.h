@@ -73,6 +73,9 @@ public:
     }
 #endif
 
+    //* load configuration
+    virtual void loadConfig();
+
     //*@name color utilities
     //@{
 
@@ -142,9 +145,6 @@ public:
             alpha = 0;
         return QColor::fromHslF(h, s, l, alpha);
     }
-
-    //* returns feren color palette
-    QPalette palette(bool dark) const;
 
     //* add alpha channel multiplier to color
     QColor alphaColor(QColor color, qreal alpha) const;
@@ -242,7 +242,7 @@ public:
     QColor checkBoxIndicatorColor(const QPalette &palette, bool mouseOver, bool active, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone, bool darkMode = false, bool inMenu = false) const;
 
     //* separator color
-    QColor separatorColor(const QPalette &palette, bool darkMode = false) const;
+    QColor separatorColor() const;
 
     //* TreeView header text color
     QColor headerTextColor(const QPalette &palette, const QStyle::State state) const;
