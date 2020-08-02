@@ -621,7 +621,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWi
     case PM_MenuButtonIndicator:
         return Metrics::MenuButton_IndicatorWidth;
     case PM_MenuVMargin:
-        return 2;
+        return _isGNOME ? 0 : 1;
     case PM_MenuHMargin:
         return _isGNOME ? 0 : 1;
 
@@ -1113,7 +1113,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
             fcn = &Style::drawMenuItemControl;
             break;
         case CE_ToolBar:
-            fcn = &Style::emptyControl;
+            fcn = &Style::drawToolBarEmptyArea;
             break;
         case CE_ProgressBar:
             fcn = &Style::drawProgressBarControl;
@@ -4634,7 +4634,7 @@ bool Style::drawItemViewItemControl(const QStyleOption *option, QPainter *painte
 }
 
 //___________________________________________________________________________________
-bool Style::drawMenuBarEmptyArea(const QStyleOption *option, QPainter *painter, const QWidget *) const
+bool Style::drawToolBarEmptyArea(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
     const QRect &rect(option->rect);
     const QPalette &palette(option->palette);
@@ -4645,6 +4645,23 @@ bool Style::drawMenuBarEmptyArea(const QStyleOption *option, QPainter *painter, 
     painter->setPen(Helper::mix(palette.color(QPalette::Window), palette.color(QPalette::Shadow), 0.2));
 
     painter->drawLine(rect.bottomLeft(), rect.bottomRight());
+    painter->restore();
+
+    return true;
+}
+
+//___________________________________________________________________________________
+bool Style::drawMenuBarEmptyArea(const QStyleOption *option, QPainter *painter, const QWidget *) const
+{
+    const QRect &rect(option->rect);
+    const QPalette &palette(option->palette);
+
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing, false);
+    painter->setBrush(Qt::NoBrush);
+    painter->setPen(Helper::mix(palette.color(QPalette::Window), palette.color(QPalette::Shadow), 0.2));
+
+    //painter->drawLine(rect.bottomLeft(), rect.bottomRight());
     painter->restore();
 
     return true;
@@ -4680,13 +4697,13 @@ bool Style::drawMenuBarItemControl(const QStyleOption *option, QPainter *painter
     painter->setBrush(Qt::NoBrush);
     painter->setPen(Helper::mix(palette.color(QPalette::Window), palette.color(QPalette::Shadow), 0.2));
 
-    painter->drawLine(rect.bottomLeft(), rect.bottomRight());
+    //painter->drawLine(rect.bottomLeft(), rect.bottomRight());
     painter->restore();
 
     // render hover and focus
     if (useStrongFocus && sunken) {
         QColor outlineColor = _helper->focusColor(palette);
-        _helper->renderFocusRect(painter, QRect(rect.left(), rect.bottom() - 2, rect.width(), 3), outlineColor);
+        _helper->renderFocusRect(painter, QRect(rect.left(), rect.top(), rect.width(), rect.height()), outlineColor);
     }
 
     // get text rect
@@ -4694,7 +4711,7 @@ bool Style::drawMenuBarItemControl(const QStyleOption *option, QPainter *painter
     QRect textRect = option->fontMetrics.boundingRect(rect, textFlags, menuItemOption->text);
 
     // render text
-    const QPalette::ColorRole role = (useStrongFocus && sunken) ? QPalette::Link : QPalette::WindowText;
+    const QPalette::ColorRole role = (useStrongFocus && sunken) ? QPalette::HighlightedText : QPalette::WindowText;
     drawItemText(painter, textRect, textFlags, palette, enabled, menuItemOption->text, role);
 
     return true;
@@ -6703,10 +6720,10 @@ void Style::renderSpinBoxArrow(const SubControl &subControl, const QStyleOptionS
 //______________________________________________________________________________
 void Style::renderMenuTitle(const QStyleOptionToolButton *option, QPainter *painter, const QWidget *) const
 {
-    // render a separator at the bottom
+    //// render a separator at the bottom
     const QPalette &palette(option->palette);
-    QColor color(_helper->separatorColor());
-    _helper->renderSeparator(painter, QRect(option->rect.bottomLeft() - QPoint(0, Metrics::MenuItem_MarginWidth), QSize(option->rect.width(), 1)), color);
+    //QColor color(_helper->separatorColor());
+    //_helper->renderSeparator(painter, QRect(option->rect.bottomLeft() - QPoint(0, Metrics::MenuItem_MarginWidth), QSize(option->rect.width(), 1)), color);
 
     // render text in the center of the rect
     // icon is discarded on purpose

@@ -308,6 +308,7 @@ protected:
     virtual bool drawCheckBoxLabelControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     virtual bool drawComboBoxLabelControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     virtual bool drawItemViewItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
+    virtual bool drawToolBarEmptyArea(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     virtual bool drawMenuBarEmptyArea(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     virtual bool drawMenuBarItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     virtual bool drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;

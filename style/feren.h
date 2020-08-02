@@ -144,16 +144,16 @@ namespace Feren
         // menu items
         Menu_FrameWidth = 0,
         MenuItem_MarginWidth = 4,
-        MenuItem_ItemSpacing = 6,
-        MenuItem_AcceleratorSpace = 16,
+        MenuItem_ItemSpacing = 4,
+        MenuItem_AcceleratorSpace = 14,
         MenuButton_IndicatorWidth = 20,
 
         // combobox
         ComboBox_FrameWidth = 4,
         ComboBox_MarginHeight = 4,
         ComboBox_MarginWidth = 8,
-        ComboBox_MinHeight = 36,
-        ComboBox_MinWidth = 80,
+        ComboBox_MinHeight = 24,
+        ComboBox_MinWidth = 69,
 
         // spinbox
         SpinBox_FrameWidth = LineEdit_FrameWidth,
@@ -168,7 +168,7 @@ namespace Feren
 
         // buttons
         Button_MinHeight = 24,
-        Button_MinWidth = 69,
+        Button_MinWidth = 69, //nice
         Button_MarginHeight = 4,
         Button_MarginWidth = 8,
         Button_ItemSpacing = 4,
@@ -181,7 +181,7 @@ namespace Feren
         // checkboxes and radio buttons
         CheckBox_Size = 21,
         CheckBox_FocusMarginWidth = 3,
-        CheckBox_ItemSpacing = 8,
+        CheckBox_ItemSpacing = 10,
 
         // menubar items
         MenuBarItem_MarginWidth = 8,

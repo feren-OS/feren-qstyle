@@ -81,7 +81,8 @@ QColor Helper::indicatorOutlineColor(const QPalette &palette, bool mouseOver, bo
 
 QColor Helper::frameOutlineColor(const QPalette &palette, bool mouseOver, bool hasFocus, qreal opacity, AnimationMode mode, bool darkMode) const
 {
-    return darken(palette.color(QPalette::Base), 0.19);
+    QColor col( 0,0,0 );
+    return alphaColor(col, 0.19);
 }
 
 QColor Helper::inputOutlineColor(const QPalette &palette, bool mouseOver, bool hasFocus, qreal opacity, AnimationMode mode, bool darkMode) const
@@ -128,7 +129,9 @@ QColor Helper::menuBackgroundColor(const QPalette &palette, QPalette::ColorGroup
 
 QColor Helper::menuOutlineColor(const QPalette &palette, QPalette::ColorGroup group) const
 {
-    return darken(palette.color(QPalette::Base), 0.19);
+    //return darken(palette.color(QPalette::Base), 0.19);
+    QColor col( 0,0,0 );
+    return alphaColor(col, 0.19);
 }
 
 //____________________________________________________________________
@@ -159,7 +162,8 @@ QColor Helper::arrowColor(const QPalette &palette, bool mouseOver, bool hasFocus
 //____________________________________________________________________
 QColor Helper::buttonOutlineColor(const QPalette &palette, bool mouseOver, bool hasFocus, qreal opacity, AnimationMode mode, bool darkMode) const
 {
-    return QColor(0,0,0,0.19);
+    QColor col( 0,0,0 );
+    return alphaColor(col, 0.19);
 }
 
 //____________________________________________________________________
