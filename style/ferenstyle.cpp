@@ -4335,12 +4335,6 @@ bool Style::drawPushButtonLabelControl(const QStyleOption *option, QPainter *pai
 
     // render text
     if (hasText && textRect.isValid()) {
-        if (enabled && !sunken && !mouseOver && !flat) {
-            if (_dark)
-                drawItemText(painter, textRect.adjusted(0, -1, 0, -1), textFlags, palette, false, buttonOption->text, QPalette::Dark);
-            else
-                drawItemText(painter, textRect.adjusted(0, 1, 0, 1), textFlags, palette, false, buttonOption->text, QPalette::Light);
-        }
         drawItemText(painter, textRect, textFlags, palette, enabled, buttonOption->text, textRole);
     }
 
@@ -4688,14 +4682,14 @@ bool Style::drawMenuBarItemControl(const QStyleOption *option, QPainter *painter
     bool useStrongFocus(Feren::Config::MenuItemDrawStrongFocus);
 
     painter->save();
-    painter->setRenderHint(QPainter::Antialiasing, false);
-
-    painter->setBrush(palette.window().color());
-    painter->setPen(Qt::NoPen);
-    painter->drawRect(rect);
-
-    painter->setBrush(Qt::NoBrush);
-    painter->setPen(Helper::mix(palette.color(QPalette::Window), palette.color(QPalette::Shadow), 0.2));
+//     painter->setRenderHint(QPainter::Antialiasing, false);
+// 
+//     painter->setBrush(palette.window().color());
+//     painter->setPen(Qt::NoPen);
+//     painter->drawRect(rect);
+// 
+//     painter->setBrush(Qt::NoBrush);
+//     painter->setPen(Helper::mix(palette.color(QPalette::Window), palette.color(QPalette::Shadow), 0.2));
 
     //painter->drawLine(rect.bottomLeft(), rect.bottomRight());
     painter->restore();
