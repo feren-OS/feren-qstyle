@@ -204,9 +204,25 @@ public:
     {
         return frameBackgroundColor(palette, palette.currentColorGroup());
     }
+    
+    //* menu background color
+    QColor menuBackgroundColor(const QPalette &palette) const
+    {
+        return menuBackgroundColor(palette, palette.currentColorGroup());
+    }
+    //* menu outline color
+    QColor menuOutlineColor(const QPalette &palette) const
+    {
+        return menuOutlineColor(palette, palette.currentColorGroup());
+    }
 
     //* frame background color
     QColor frameBackgroundColor(const QPalette &palette, QPalette::ColorGroup) const;
+    
+    //* menu background color
+    QColor menuBackgroundColor(const QPalette &palette, QPalette::ColorGroup) const;
+    //* menu outline color
+    QColor menuOutlineColor(const QPalette &palette, QPalette::ColorGroup) const;
 
     //* arrow outline color
     QColor arrowColor(const QPalette &palette, QPalette::ColorGroup, QPalette::ColorRole) const;

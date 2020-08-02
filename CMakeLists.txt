@@ -2,8 +2,13 @@ project(Feren)
 
 cmake_minimum_required(VERSION 2.8.11)
 
+set(KF5_MIN_VERSION "5.66.0")
+
 set(CMAKE_AUTOMOC ON)
 add_definitions(-std=c++11)
+
+find_package(ECM ${KF5_MIN_VERSION} REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_SOURCE_DIR}/cmake)
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
@@ -21,6 +26,8 @@ if (NOT QT_PLUGINS_DIR)
                     OUTPUT_VARIABLE QT_PLUGINS_DIR
                     ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif()
+
+find_package(KF5Package ${KF5_MIN_VERSION} CONFIG REQUIRED)
 
 if (NOT CMAKE_INSTALL_PREFIX)
     set (CMAKE_INSTALL_PREFIX "/usr/local")

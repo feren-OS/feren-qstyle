@@ -57,6 +57,7 @@ class Mnemonics;
 class SplitterFactory;
 class WidgetExplorer;
 class WindowManager;
+class BlurHelper;
 
 //* convenience typedef for base class
 #if ADWAITA_USE_KDE4
@@ -519,6 +520,9 @@ private:
 
     //* keyboard accelerators
     Mnemonics *_mnemonics;
+
+    //* blur helper
+    BlurHelper* _blurHelper = nullptr;
 
     //* window manager
     WindowManager *_windowManager;

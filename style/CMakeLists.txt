@@ -1,3 +1,22 @@
+################# Qt/KDE #################
+find_package(Qt5 REQUIRED CONFIG COMPONENTS Widgets DBus)
+find_package(KF5 REQUIRED COMPONENTS
+    I18n
+    Config
+    GuiAddons
+    IconThemes
+    ConfigWidgets
+    WindowSystem)
+
+find_package( KF5FrameworkIntegration CONFIG )
+set_package_properties(KF5FrameworkIntegration PROPERTIES
+    DESCRIPTION "KF5 Framework Integration"
+    URL "https://projects.kde.org/projects/frameworks/frameworkintegration"
+    TYPE OPTIONAL
+    PURPOSE "Required to use KStyle convenience functionalities in style")
+
+find_package(Qt5 COMPONENTS Quick)
+set(FEREN_HAVE_QTQUICK ${Qt5Quick_FOUND})
 
 configure_file(config-feren.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-feren.h )
 
@@ -29,6 +48,7 @@ set(Feren_SRCS
     animations/ferenwidgetstatedata.cpp
     debug/ferenwidgetexplorer.cpp
     ferenaddeventfilter.cpp
+    ferenblurhelper.cpp
     ferenhelper.cpp
     ferenmnemonics.cpp
     ferensplitterproxy.cpp
@@ -54,6 +74,10 @@ set(LIBRARY_NAME "feren-qt${QT_VERSION_NUMBER}")
 
 add_library(${LIBRARY_NAME} MODULE ${Feren_SRCS})
 target_link_libraries(${LIBRARY_NAME} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDBUS_LIBRARY})
+if( FEREN_HAVE_QTQUICK )
+    target_link_libraries(${LIBRARY_NAME} Qt5::Quick)
+endif()
+target_link_libraries(${LIBRARY_NAME} KF5::ConfigCore KF5::ConfigWidgets KF5::GuiAddons KF5::IconThemes KF5::WindowSystem)
 set_target_properties(${LIBRARY_NAME} PROPERTIES
     LINK_FLAGS "-Wl,--no-undefined"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"

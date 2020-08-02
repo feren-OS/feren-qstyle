@@ -28,6 +28,7 @@
 #include "ferensplitterproxy.h"
 #include "ferenwidgetexplorer.h"
 #include "ferenwindowmanager.h"
+#include "ferenblurhelper.h"
 
 #include <QApplication>
 #include <QCheckBox>
@@ -227,6 +228,7 @@ Style::Style(bool dark)
 #endif
     , _animations(new Animations(this))
     , _mnemonics(new Mnemonics(this))
+    , _blurHelper( new BlurHelper( this ) )
     , _windowManager(new WindowManager(this))
     , _splitterFactory(new SplitterFactory(this))
     , _widgetExplorer(new WidgetExplorer(this))
@@ -366,7 +368,11 @@ void Style::polish(QWidget *widget)
         widget->setAutoFillBackground(false);
         widget->parentWidget()->setAutoFillBackground(false);
     } else if (qobject_cast<QMenu *>(widget)) {
-        setTranslucentBackground(widget);
+        setTranslucentBackground( widget );
+
+        if ( _helper->hasAlphaChannel( widget ) ) {
+            _blurHelper->registerWidget( widget->window() );
+        }
 #if QT_VERSION >= 0x050000
     } else if (qobject_cast<QCommandLinkButton *>(widget)) {
         addEventFilter(widget);
@@ -507,6 +513,7 @@ void Style::unpolish(QWidget *widget)
     _animations->unregisterWidget(widget);
     _windowManager->unregisterWidget(widget);
     _splitterFactory->unregisterWidget(widget);
+    _blurHelper->unregisterWidget( widget );
 
     // remove event filter
     if (qobject_cast<QAbstractScrollArea *>(widget)
@@ -1410,8 +1417,8 @@ bool Style::eventFilterComboBoxContainer(QWidget *widget, QEvent *event)
 
         QRect rect(widget->rect());
         const QPalette &palette(widget->palette());
-        QColor background(_helper->frameBackgroundColor(palette));
-        QColor outline(_helper->frameOutlineColor(palette));
+        QColor background(_helper->menuBackgroundColor(palette));
+        QColor outline(_helper->menuOutlineColor(palette));
 
         bool hasAlpha(_helper->hasAlphaChannel(widget));
         if (hasAlpha) {
@@ -3279,15 +3286,15 @@ bool Style::drawFrameMenuPrimitive(const QStyleOption *option, QPainter *painter
     // do nothing for other cases, for which frame is rendered via drawPanelMenuPrimitive
     if (qobject_cast<const QToolBar *>(widget)) {
         const QPalette &palette(option->palette);
-        QColor background(_helper->frameBackgroundColor(palette));
-        QColor outline(_helper->frameOutlineColor(palette));
+        QColor background(_helper->menuBackgroundColor(palette));
+        QColor outline(_helper->menuOutlineColor(palette));
 
         bool hasAlpha(_helper->hasAlphaChannel(widget));
         _helper->renderMenuFrame(painter, option->rect, background, outline, hasAlpha);
     } else if (isQtQuickControl(option, widget)) {
         const QPalette &palette(option->palette);
-        QColor background(_helper->frameBackgroundColor(palette));
-        QColor outline(_helper->frameOutlineColor(palette));
+        QColor background(_helper->menuBackgroundColor(palette));
+        QColor outline(_helper->menuOutlineColor(palette));
 
         bool hasAlpha(_helper->hasAlphaChannel(widget));
         _helper->renderMenuFrame(painter, option->rect, background, outline, hasAlpha);
@@ -3709,8 +3716,8 @@ bool Style::drawPanelMenuPrimitive(const QStyleOption *option, QPainter *painter
         return true;
 
     const QPalette &palette(option->palette);
-    QColor background(_helper->frameBackgroundColor(palette));
-    QColor outline(_helper->frameOutlineColor(palette));
+    QColor background(_helper->menuBackgroundColor(palette));
+    QColor outline(_helper->menuOutlineColor(palette));
 
     bool hasAlpha(_helper->hasAlphaChannel(widget));
     _helper->renderMenuFrame(painter, option->rect, background, outline, hasAlpha);

@@ -167,8 +167,8 @@ namespace Feren
         GroupBox_TitleMarginWidth = 4,
 
         // buttons
-        Button_MinHeight = 36,
-        Button_MinWidth = 80,
+        Button_MinHeight = 24,
+        Button_MinWidth = 69,
         Button_MarginHeight = 4,
         Button_MarginWidth = 8,
         Button_ItemSpacing = 4,
@@ -179,7 +179,7 @@ namespace Feren
         ToolButton_InlineIndicatorWidth = 12,
 
         // checkboxes and radio buttons
-        CheckBox_Size = 22,
+        CheckBox_Size = 21,
         CheckBox_FocusMarginWidth = 3,
         CheckBox_ItemSpacing = 8,
 

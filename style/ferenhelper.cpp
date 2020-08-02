@@ -23,6 +23,8 @@
 
 #include "feren.h"
 
+#include <KWindowSystem>
+
 #include <QApplication>
 #include <QPainter>
 #include <QLibrary>
@@ -79,8 +81,7 @@ QColor Helper::indicatorOutlineColor(const QPalette &palette, bool mouseOver, bo
 
 QColor Helper::frameOutlineColor(const QPalette &palette, bool mouseOver, bool hasFocus, qreal opacity, AnimationMode mode, bool darkMode) const
 {
-    // I really can't remember why we have differed these two cases. This seems right.
-    return inputOutlineColor(palette, mouseOver, hasFocus, opacity, mode, darkMode);
+    return darken(palette.color(QPalette::Base), 0.19);
 }
 
 QColor Helper::inputOutlineColor(const QPalette &palette, bool mouseOver, bool hasFocus, qreal opacity, AnimationMode mode, bool darkMode) const
@@ -115,7 +116,19 @@ QColor Helper::sidePanelOutlineColor(const QPalette &palette, bool hasFocus, qre
 //____________________________________________________________________
 QColor Helper::frameBackgroundColor(const QPalette &palette, QPalette::ColorGroup group) const
 {
-    return mix(palette.color(group, QPalette::Window), palette.color(group, QPalette::Base), 0.3);
+    return palette.color(group, QPalette::Base);
+}
+
+QColor Helper::menuBackgroundColor(const QPalette &palette, QPalette::ColorGroup group) const
+{
+    QColor color = palette.color(group, QPalette::Base);
+    color.setAlphaF(0.7);
+    return color;
+}
+
+QColor Helper::menuOutlineColor(const QPalette &palette, QPalette::ColorGroup group) const
+{
+    return darken(palette.color(QPalette::Base), 0.19);
 }
 
 //____________________________________________________________________
@@ -146,11 +159,7 @@ QColor Helper::arrowColor(const QPalette &palette, bool mouseOver, bool hasFocus
 //____________________________________________________________________
 QColor Helper::buttonOutlineColor(const QPalette &palette, bool mouseOver, bool hasFocus, qreal opacity, AnimationMode mode, bool darkMode) const
 {
-    if (darkMode) {
-        return darken(palette.color(QPalette::Window), 0.1);
-    } else {
-        return darken(palette.color(QPalette::Window), 0.18);
-    }
+    return QColor(0,0,0,0.19);
 }
 
 //____________________________________________________________________
@@ -598,7 +607,7 @@ void Helper::renderSidePanelFrame(QPainter *painter, const QRect &rect, const QC
 void Helper::renderMenuFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, bool roundCorners) const
 {
     // set brush
-    if (color.isValid())
+    if (color.isValid()) 
         painter->setBrush(color);
     else
         painter->setBrush(Qt::NoBrush);
@@ -1604,19 +1613,8 @@ QPainterPath Helper::roundedPath(const QRectF &rect, Corners corners, qreal radi
 //________________________________________________________________________________________________________
 bool Helper::compositingActive(void) const
 {
-#if ADWAITA_HAVE_X11
-    if (isX11()) {
-        // direct call to X
-        xcb_get_selection_owner_cookie_t cookie(xcb_get_selection_owner(connection(), _compositingManagerAtom));
-        ScopedPointer<xcb_get_selection_owner_reply_t> reply(xcb_get_selection_owner_reply(connection(), cookie, nullptr));
-        return reply && reply->owner;
-
-    }
-#endif
-
     // use KWindowSystem
-    //return KWindowSystem::compositingActive();
-    return false;
+    return KWindowSystem::compositingActive();
 
 }
 
