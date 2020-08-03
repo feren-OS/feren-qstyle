@@ -629,7 +629,7 @@ void Helper::renderMenuFrame(QPainter *painter, const QRect &rect, const QColor 
 
 //______________________________________________________________________________
 void Helper::renderButtonFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, const QColor &shadow,
-                               bool hasFocus, bool sunken, bool mouseOver, bool active, bool darkMode) const
+                               bool hasFocus, bool sunken, bool mouseOver, bool active, const QPalette &palette) const
 {
     // setup painter
     painter->setRenderHint(QPainter::Antialiasing, true);
@@ -652,32 +652,20 @@ void Helper::renderButtonFrame(QPainter *painter, const QRect &rect, const QColo
         QLinearGradient gradient(frameRect.bottomLeft(), frameRect.topLeft());
         if (sunken) {
             // Pressed button in normal and dark mode is not a gradient, just an image consting from same $color
-            gradient.setColorAt(0, color);
-            gradient.setColorAt(1, color);
+            // TODO: false is for _dark
+            QColor background(indicatorBackgroundColor(palette, mouseOver, false, sunken, AnimationData::OpacityInvalid, AnimationNone, CheckOn, false));
+            gradient.setColorAt(0, background);
+            gradient.setColorAt(1, lighten(background, 0.04));
         } else if (mouseOver) {
-            if (darkMode) {
-                QColor baseColor = lighten(color, 0.01);
-                // Hovered button in dark mode is a gradient from $color to lighten(bg_color, 0.01)
-                gradient.setColorAt(0, lighten(baseColor, 0.01)); // FIXME not correct according to feren's _drawing.scss file, but looks more close than before
-                gradient.setColorAt(1, lighten(baseColor, 0.01));
-            } else {
-                QColor baseColor = color;
-                // Hovered button in normal mode is a gradient from $color to lighten(bg_color, 0.01)
-                gradient.setColorAt(0, color);
-                gradient.setColorAt(1, lighten(baseColor, 0.01));
-            }
+            QColor baseColor = color;
+            // Hovered button in normal mode is a gradient from $color to lighten(bg_color, 0.01)
+            gradient.setColorAt(0, color);
+            gradient.setColorAt(1, lighten(baseColor, 0.01));
         } else {
-            if (darkMode) {
-                QColor baseColor = lighten(color, 0.01);
-                // Normal button in dark mode is a gradient from $color to bg_color
-                gradient.setColorAt(0, color);
-                gradient.setColorAt(1, baseColor);
-            } else {
-                QColor baseColor = lighten(color, 0.04);
-                // Normal button in normal mode is a gradient from $color to bg_color
-                gradient.setColorAt(0, color);
-                gradient.setColorAt(1, baseColor);
-            }
+            QColor baseColor = lighten(color, 0.04);
+            // Normal button in normal mode is a gradient from $color to bg_color
+            gradient.setColorAt(0, color);
+            gradient.setColorAt(1, baseColor);
         }
         painter->setBrush(gradient);
     } else if (!active) {
@@ -690,9 +678,12 @@ void Helper::renderButtonFrame(QPainter *painter, const QRect &rect, const QColo
     painter->drawRoundedRect(frameRect, radius, radius);
 
     if (!sunken && active && color.isValid()) {
-        painter->setPen(color.lighter(140));
-        painter->drawLine(frameRect.topLeft() + QPoint(3, 1), frameRect.topRight() + QPoint(-3, 1));
         painter->setPen(outline.darker(114));
+        painter->drawLine(frameRect.bottomLeft() + QPointF(2.7, 0), frameRect.bottomRight() + QPointF(-2.7, 0));
+    } else if (sunken) {
+        // TODO: false is for _dark
+        QColor outline2(indicatorOutlineColor(palette, mouseOver, false, AnimationData::OpacityInvalid, AnimationNone, CheckOn, false));
+        painter->setPen(outline2.darker(114));
         painter->drawLine(frameRect.bottomLeft() + QPointF(2.7, 0), frameRect.bottomRight() + QPointF(-2.7, 0));
     }
 }

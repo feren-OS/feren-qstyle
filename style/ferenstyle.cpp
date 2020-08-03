@@ -3577,7 +3577,7 @@ bool Style::drawPanelButtonCommandPrimitive(const QStyleOption *option, QPainter
         QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark));
 
         // render
-        _helper->renderButtonFrame(painter, rect, background, outline, shadow, hasFocus, sunken, mouseOver, enabled && windowActive, _dark);
+        _helper->renderButtonFrame(painter, rect, background, outline, shadow, hasFocus, sunken, mouseOver, enabled && windowActive, palette);
     }
 
     return true;
@@ -3624,7 +3624,7 @@ bool Style::drawPanelButtonToolPrimitive(const QStyleOption *option, QPainter *p
         }
 
         // render
-        _helper->renderButtonFrame(painter, rect, background, outline, shadow, hasFocus, sunken, mouseOver, windowActive);
+        _helper->renderButtonFrame(painter, rect, background, outline, shadow, hasFocus, sunken, mouseOver, windowActive, palette);
     } else {
         QColor color(_helper->toolButtonColor(palette, mouseOver, hasFocus, sunken, opacity, mode));
         _helper->renderToolButtonFrame(painter, rect, color, sunken);
@@ -3972,7 +3972,7 @@ bool Style::drawIndicatorButtonDropDownPrimitive(const QStyleOption *option, QPa
     frameRect = visualRect(option, frameRect);
 
     // render
-    _helper->renderButtonFrame(painter, frameRect, background, outline, shadow, hasFocus, sunken, mouseOver, windowActive);
+    _helper->renderButtonFrame(painter, frameRect, background, outline, shadow, hasFocus, sunken, mouseOver, windowActive, palette);
 
     // also render separator
     QRect separatorRect(rect.adjusted(0, 2, -2, -2));
@@ -4236,6 +4236,8 @@ bool Style::drawPushButtonLabelControl(const QStyleOption *option, QPainter *pai
     bool enabled(state & State_Enabled);
     bool sunken(state & (State_On | State_Sunken));
     bool mouseOver((state & State_Active) && enabled && (option->state & State_MouseOver));
+    bool selected(state & State_Selected);
+    bool active(state & State_Active);
     bool hasFocus(enabled && !mouseOver && (option->state & State_HasFocus));
     bool flat(buttonOption->features & QStyleOptionButton::Flat);
 
@@ -4249,13 +4251,15 @@ bool Style::drawPushButtonLabelControl(const QStyleOption *option, QPainter *pai
     // color role
     QPalette::ColorRole textRole;
     if (flat) {
-        if (hasFocus && sunken) {
-            textRole = QPalette::ButtonText;
-        } else {
-            textRole = QPalette::WindowText;
-        }
+        //if (hasFocus && sunken) {
+        //    textRole = QPalette::HighlightedText;
+        //} else {
+        textRole = QPalette::WindowText;
+        //}
     } else if (hasFocus) {
         textRole = QPalette::ButtonText;
+    } else if (sunken || (selected && active)) {
+        textRole = QPalette::HighlightedText;
     } else {
         textRole = QPalette::ButtonText;
     }
@@ -4273,7 +4277,8 @@ bool Style::drawPushButtonLabelControl(const QStyleOption *option, QPainter *pai
         arrowRect = visualRect(option, arrowRect);
 
         // define color
-        QColor arrowColor(_helper->arrowColor(palette, textRole));
+        //QColor arrowColor(_helper->arrowColor(palette, textRole));
+        QColor arrowColor(textRole);
         _helper->renderArrow(painter, arrowRect, arrowColor, ArrowDown);
     }
 
@@ -4318,16 +4323,12 @@ bool Style::drawPushButtonLabelControl(const QStyleOption *option, QPainter *pai
     // render icon
     if (hasIcon && iconRect.isValid()) {
         // icon state and mode
-        const QIcon::State iconState(sunken ? QIcon::On : QIcon::Off);
+        const QIcon::State iconState( sunken ? QIcon::On : QIcon::Off );
         QIcon::Mode iconMode;
-        if (!enabled)
-            iconMode = QIcon::Disabled;
-        else if (!flat && hasFocus)
-            iconMode = QIcon::Selected;
-        else if (mouseOver && flat)
-            iconMode = QIcon::Active;
-        else
-            iconMode = QIcon::Normal;
+        if( !enabled ) iconMode = QIcon::Disabled;
+        else if( !flat && hasFocus ) iconMode = QIcon::Selected;
+        else if( mouseOver && flat ) iconMode = QIcon::Active;
+        else iconMode = QIcon::Normal;
 
         QPixmap pixmap = buttonOption->icon.pixmap(iconSize, iconMode, iconState);
         drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
@@ -4356,6 +4357,8 @@ bool Style::drawToolButtonLabelControl(const QStyleOption *option, QPainter *pai
     bool enabled(state & State_Enabled);
     bool sunken(state & (State_On | State_Sunken));
     bool mouseOver((state & State_Active) && enabled && (option->state & State_MouseOver));
+    bool selected(state & State_Selected);
+    bool active(state & State_Active);
     bool flat(state & State_AutoRaise);
 
     // focus flag is set to match the background color in either renderButtonFrame or renderToolButtonFrame
@@ -4459,8 +4462,8 @@ bool Style::drawToolButtonLabelControl(const QStyleOption *option, QPainter *pai
     if (hasText && textRect.isValid()) {
         QPalette::ColorRole textRole(QPalette::ButtonText);
         if (flat)
-            textRole = (hasFocus && sunken && !mouseOver) ? QPalette::HighlightedText : QPalette::WindowText;
-        else if (hasFocus && !mouseOver)
+            textRole = (sunken || (active && selected)) ? QPalette::HighlightedText : QPalette::WindowText;
+        else if (sunken || (active && selected))
             textRole = QPalette::HighlightedText;
 
         painter->setFont(toolButtonOption->font);
@@ -4536,10 +4539,17 @@ bool Style::drawComboBoxLabelControl(const QStyleOption *option, QPainter *paint
     bool enabled(state & State_Enabled);
     bool sunken(state & (State_On | State_Sunken));
     bool mouseOver((state & State_Active) && enabled && (option->state & State_MouseOver));
+    bool selected(state & State_Selected);
+    bool active(state & State_Active);
     bool hasFocus(enabled && !mouseOver && (option->state & State_HasFocus));
     bool flat(!comboBoxOption->frame);
 
     QPalette::ColorRole textRole = QPalette::ButtonText;
+    if (selected && active) {
+        QPalette::ColorRole textRole = QPalette::HighlightedText;
+    } else {
+        QPalette::ColorRole textRole = QPalette::ButtonText;
+    }
 
     // change pen color directly
     painter->save();
@@ -6120,7 +6130,7 @@ bool Style::drawComboBoxComplexControl(const QStyleOptionComplex *option, QPaint
                 QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark));
 
                 // render
-                _helper->renderButtonFrame(painter, rect, background, outline, shadow, hasFocus, sunken, mouseOver, enabled && windowActive, _dark);
+                _helper->renderButtonFrame(painter, rect, background, outline, shadow, hasFocus, sunken, mouseOver, enabled && windowActive, palette);
 
                 QStyleOptionComplex tmpOpt(*option);
                 tmpOpt.rect.setWidth(tmpOpt.rect.width() - subControlRect(CC_ComboBox, option, SC_ComboBoxArrow, widget).width() + 3);
@@ -6142,7 +6152,7 @@ bool Style::drawComboBoxComplexControl(const QStyleOptionComplex *option, QPaint
                 QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark));
 
                 // render
-                _helper->renderButtonFrame(painter, rect, background, outline, shadow, hasFocus, sunken, mouseOver, enabled && windowActive, _dark);
+                _helper->renderButtonFrame(painter, rect, background, outline, shadow, hasFocus, sunken, mouseOver, enabled && windowActive, palette);
 
                 if (hasFocus) {
                     QStyleOption copy(*option);
@@ -6159,14 +6169,16 @@ bool Style::drawComboBoxComplexControl(const QStyleOptionComplex *option, QPaint
         const QComboBox *comboBox = qobject_cast<const QComboBox *>(widget);
         bool empty(comboBox && !comboBox->count());
 
-        // arrow color
-        QColor arrowColor = _helper->arrowColor(palette, QPalette::ButtonText);
 
         // arrow rect
         QRect arrowRect(subControlRect(CC_ComboBox, option, SC_ComboBoxArrow, widget));
 
         // render
-        _helper->renderArrow(painter, arrowRect, arrowColor, ArrowDown);
+        if (sunken) {
+            _helper->renderArrow(painter, arrowRect, _helper->arrowColor(palette, QPalette::HighlightedText), ArrowDown);
+        } else {
+            _helper->renderArrow(painter, arrowRect, _helper->arrowColor(palette, QPalette::ButtonText), ArrowDown);
+        }
     }
 
     return true;
