@@ -31,6 +31,8 @@
 #include "ferenblurhelper.h"
 
 #include <KColorUtils>
+#include <KConfigGroup>
+#include <KSharedConfig>
 
 #include <QApplication>
 #include <QCheckBox>
