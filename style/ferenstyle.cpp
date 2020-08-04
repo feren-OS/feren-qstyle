@@ -3470,6 +3470,9 @@ bool Style::drawIndicatorArrowPrimitive(ArrowOrientation orientation, const QSty
         // cast option
         const QStyleOptionToolButton *toolButtonOption(static_cast<const QStyleOptionToolButton *>(option));
         bool hasPopupMenu(toolButtonOption->subControls & SC_ToolButtonMenu);
+        bool sunken(state & (State_On | State_Sunken));
+        bool selected(state & State_Selected);
+        bool active(state & State_Active);
         if (flat && hasPopupMenu) {
             // for menu arrows in flat toolbutton one uses animations to get the arrow color
             // handle arrow over animation
@@ -3479,15 +3482,17 @@ bool Style::drawIndicatorArrowPrimitive(ArrowOrientation orientation, const QSty
             bool animated(_animations->toolButtonEngine().isAnimated(widget, AnimationHover));
             qreal opacity(_animations->toolButtonEngine().opacity(widget, AnimationHover));
 
-            color = _helper->arrowColor(palette, arrowHover, false, opacity, animated ? AnimationHover : AnimationNone);
+            if (sunken || (selected && active))
+                color = palette.color(QPalette::HighlightedText);
+            else
+                color = _helper->arrowColor(palette, arrowHover, false, opacity, animated ? AnimationHover : AnimationNone);
         } else {
-            bool sunken(state & (State_On | State_Sunken));
             if (flat) {
-                if (sunken && hasFocus && !mouseOver)
+                if (sunken || (selected && active))
                     color = palette.color(QPalette::HighlightedText);
                 else
                     color = _helper->arrowColor(palette, QPalette::WindowText);
-            } else if (hasFocus && !mouseOver)  {
+            } else if (sunken || (selected && active))  {
                 color = palette.color(QPalette::HighlightedText);
             } else {
                 color = _helper->arrowColor(palette, QPalette::ButtonText);
@@ -3875,7 +3880,7 @@ bool Style::drawIndicatorCheckBoxPrimitive(const QStyleOption *option, QPainter 
 
     // render
     QColor shadow(_helper->shadowColor(palette));
-    _helper->renderCheckBox(painter, rect, background, outline, tickColor, sunken, checkBoxState, mouseOver, animation, enabled && windowActive, _dark);
+    _helper->renderCheckBox(painter, rect, background, outline, tickColor, sunken, checkBoxState, mouseOver, palette, animation, enabled && windowActive, _dark);
     return true;
 }
 
@@ -3923,7 +3928,7 @@ bool Style::drawIndicatorRadioButtonPrimitive(const QStyleOption *option, QPaint
     }
 
     // render
-    _helper->renderRadioButton(painter, rect, background, outline, tickColor, sunken, enabled && windowActive, radioButtonState, animation, mouseOver, _dark, false);
+    _helper->renderRadioButton(painter, rect, background, outline, tickColor, sunken, enabled && windowActive, radioButtonState, palette, animation, mouseOver, _dark, false);
 
     return true;
 }
@@ -4544,16 +4549,16 @@ bool Style::drawComboBoxLabelControl(const QStyleOption *option, QPainter *paint
     bool hasFocus(enabled && !mouseOver && (option->state & State_HasFocus));
     bool flat(!comboBoxOption->frame);
 
-    QPalette::ColorRole textRole = QPalette::ButtonText;
-    if (selected && active) {
-        QPalette::ColorRole textRole = QPalette::HighlightedText;
-    } else {
-        QPalette::ColorRole textRole = QPalette::ButtonText;
-    }
-
     // change pen color directly
     painter->save();
-    painter->setPen(QPen(option->palette.color(textRole), 1));
+    // Just sunken because adding the usual set causes it to have highlightedtext on combobox focus, which we don't want
+    if (sunken) {
+        QPalette::ColorRole textRole = QPalette::HighlightedText;
+        painter->setPen(QPen(option->palette.color(textRole), 1));
+    } else {
+        QPalette::ColorRole textRole = QPalette::ButtonText;
+        painter->setPen(QPen(option->palette.color(textRole), 1));
+    }
 
 #if QT_VERSION >= 0x050000
     if (const QStyleOptionComboBox *cb = qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
@@ -4804,7 +4809,7 @@ bool Style::drawMenuItemControl(const QStyleOption *option, QPainter *painter, c
         AnimationMode mode(_animations->widgetStateEngine().isAnimated(widget, AnimationHover) ? AnimationHover : AnimationNone);
         qreal opacity(_animations->widgetStateEngine().opacity(widget, AnimationHover));
         QColor tickColor = _helper->checkBoxIndicatorColor(palette, mouseOver, enabled && active, opacity, mode, _dark, true);
-        _helper->renderCheckBox(painter, checkBoxRect, indicatorBackground, outline, tickColor, false, checkState, mouseOver, enabled && windowActive, _dark, true);
+        _helper->renderCheckBox(painter, checkBoxRect, indicatorBackground, outline, tickColor, false, checkState, mouseOver, palette, enabled && windowActive, _dark, true);
     } else if (menuItemOption->checkType == QStyleOptionMenuItem::Exclusive) {
         checkBoxRect = visualRect(option, checkBoxRect);
 
@@ -4817,7 +4822,7 @@ bool Style::drawMenuItemControl(const QStyleOption *option, QPainter *painter, c
         AnimationMode mode(_animations->widgetStateEngine().isAnimated(widget, AnimationHover) ? AnimationHover : AnimationNone);
         qreal opacity(_animations->widgetStateEngine().opacity(widget, AnimationHover));
         QColor tickColor = _helper->checkBoxIndicatorColor(palette, mouseOver, enabled && active, opacity, mode, _dark, true);
-        _helper->renderRadioButton(painter, checkBoxRect, indicatorBackground, outline, tickColor, false, enabled && windowActive, active ? RadioOn : RadioOff, _dark, true);
+        _helper->renderRadioButton(painter, checkBoxRect, indicatorBackground, outline, tickColor, false, enabled && windowActive, active ? RadioOn : RadioOff, palette, _dark, true);
     }
 
     // icon
@@ -5398,35 +5403,39 @@ bool Style::drawHeaderLabelControl(const QStyleOption *option, QPainter *painter
 }
 
 //___________________________________________________________________________________
-bool Style::drawHeaderEmptyAreaControl(const QStyleOption *option, QPainter *painter, const QWidget *) const
+bool Style::drawHeaderEmptyAreaControl( const QStyleOption* option, QPainter* painter, const QWidget* ) const
 {
-    // use the same background as in drawHeaderPrimitive
-    const QRect &rect(option->rect);
-    QPalette palette(option->palette);
 
-    bool horizontal(option->state & QStyle::State_Horizontal);
-    bool reverseLayout(option->direction == Qt::RightToLeft);
+    // use the same background as in drawHeaderPrimitive
+    const auto& rect( option->rect );
+    auto palette( option->palette );
+
+    const bool horizontal( option->state & QStyle::State_Horizontal );
+    const bool reverseLayout( option->direction == Qt::RightToLeft );
 
     // fill
-    painter->setRenderHint(QPainter::Antialiasing, false);
-    painter->setBrush(palette.color(QPalette::Base));
-    painter->setPen(Qt::NoPen);
-    painter->drawRect(rect);
+    painter->setRenderHint( QPainter::Antialiasing, false );
+    painter->setBrush( palette.color( QPalette::Button ) );
+    painter->setPen( Qt::NoPen );
+    painter->drawRect( rect );
 
     // outline
-    painter->setBrush(Qt::NoBrush);
-    painter->setPen(_helper->alphaColor(palette.color(QPalette::ButtonText), 0.1));
+    painter->setBrush( Qt::NoBrush );
+    painter->setPen( _helper->alphaColor( palette.color( QPalette::ButtonText ), 0.1 ) );
 
-    if (horizontal) {
-        painter->drawLine(rect.bottomLeft(), rect.bottomRight());
+    if( horizontal ) {
+
+        painter->drawLine( rect.bottomLeft(), rect.bottomRight() );
+
     } else {
-        if (reverseLayout)
-            painter->drawLine(rect.topLeft(), rect.bottomLeft());
-        else
-            painter->drawLine(rect.topRight(), rect.bottomRight());
+
+        if( reverseLayout ) painter->drawLine( rect.topLeft(), rect.bottomLeft() );
+        else painter->drawLine( rect.topRight(), rect.bottomRight() );
+
     }
 
     return true;
+
 }
 
 //___________________________________________________________________________________
@@ -6174,6 +6183,7 @@ bool Style::drawComboBoxComplexControl(const QStyleOptionComplex *option, QPaint
         QRect arrowRect(subControlRect(CC_ComboBox, option, SC_ComboBoxArrow, widget));
 
         // render
+        // again, only sunken 'cos issues occur if anything else's added
         if (sunken) {
             _helper->renderArrow(painter, arrowRect, _helper->arrowColor(palette, QPalette::HighlightedText), ArrowDown);
         } else {

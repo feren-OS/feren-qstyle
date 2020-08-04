@@ -268,11 +268,7 @@ QColor Helper::indicatorBackgroundColor(const QPalette &palette, bool mouseOver,
             }
         }
     } else {
-        if (darkMode) {
-            return lighten(palette.color(QPalette::Highlight));
-        } else {
-            return palette.color(QPalette::Highlight);
-        }
+        return palette.color(QPalette::Highlight);
     }
 
     return indicatorColor;
@@ -654,8 +650,8 @@ void Helper::renderButtonFrame(QPainter *painter, const QRect &rect, const QColo
             // Pressed button in normal and dark mode is not a gradient, just an image consting from same $color
             // TODO: false is for _dark
             QColor background(indicatorBackgroundColor(palette, mouseOver, false, sunken, AnimationData::OpacityInvalid, AnimationNone, CheckOn, false));
-            gradient.setColorAt(0, background);
-            gradient.setColorAt(1, lighten(background, 0.04));
+            gradient.setColorAt(0, darken(background, 0.014));
+            gradient.setColorAt(1, background);
         } else if (mouseOver) {
             QColor baseColor = color;
             // Hovered button in normal mode is a gradient from $color to lighten(bg_color, 0.01)
@@ -683,13 +679,13 @@ void Helper::renderButtonFrame(QPainter *painter, const QRect &rect, const QColo
     } else if (sunken) {
         // TODO: false is for _dark
         QColor outline2(indicatorOutlineColor(palette, mouseOver, false, AnimationData::OpacityInvalid, AnimationNone, CheckOn, false));
-        painter->setPen(outline2.darker(114));
+        painter->setPen(outline2.darker(130));
         painter->drawLine(frameRect.bottomLeft() + QPointF(2.7, 0), frameRect.bottomRight() + QPointF(-2.7, 0));
     }
 }
 
 //______________________________________________________________________________
-void Helper::renderCheckBoxFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, const QColor &shadow,
+void Helper::renderCheckBoxFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, const QPalette &palette, const QColor &shadow,
                                bool hasFocus, bool sunken, bool mouseOver, bool active, CheckBoxState state, bool darkMode, bool inMenu) const
 {
     // setup painter
@@ -701,8 +697,12 @@ void Helper::renderCheckBoxFrame(QPainter *painter, const QRect &rect, const QCo
     qreal radius(frameRadius());
 
     if (outline.isValid()) {
-        painter->setPen(QPen(outline, 1.0));
-
+        if (!inMenu && state != CheckOff) {
+            painter->setPen(QPen(palette.color(QPalette::Highlight).darker(130), 1.0));
+        } else {
+            painter->setPen(QPen(outline, 1.0));
+        }
+        
         frameRect.adjust(0.5, 0.5, -0.5, -0.5);
         radius = qMax(radius - 1, qreal(0.0));
     } else
@@ -756,8 +756,8 @@ void Helper::renderCheckBoxFrame(QPainter *painter, const QRect &rect, const QCo
     } else {
         if (color.isValid()) {
             QLinearGradient gradient(frameRect.bottomLeft(), frameRect.topLeft());
-            gradient.setColorAt(0, color);
-            gradient.setColorAt(1, lighten(color, 0.04));
+            gradient.setColorAt(0, darken(color, 0.014));
+            gradient.setColorAt(1, color);
             painter->setBrush(gradient);
         } else {
             painter->setBrush(Qt::NoBrush);
@@ -971,7 +971,7 @@ void Helper::renderCheckBoxBackground(QPainter *painter, const QRect &rect, cons
 
 //______________________________________________________________________________
 void Helper::renderCheckBox(QPainter *painter, const QRect &rect, const QColor &background, const QColor &outline, const QColor &tickColor,
-                            bool sunken, CheckBoxState state, bool mouseOver, qreal animation, bool active, bool darkMode, bool inMenu) const
+                            bool sunken, CheckBoxState state, bool mouseOver, const QPalette &palette, qreal animation, bool active, bool darkMode, bool inMenu) const
 {
     // setup painter
     painter->save();
@@ -984,7 +984,7 @@ void Helper::renderCheckBox(QPainter *painter, const QRect &rect, const QColor &
 
     // content
     {
-        renderCheckBoxFrame(painter, rect, background, outline, Qt::transparent, false, sunken, mouseOver, active, state, darkMode, inMenu);
+        renderCheckBoxFrame(painter, rect, background, outline, palette, Qt::transparent, false, sunken, mouseOver, active, state, darkMode, inMenu);
     }
 
     // mark
@@ -992,46 +992,46 @@ void Helper::renderCheckBox(QPainter *painter, const QRect &rect, const QColor &
         painter->save();
         painter->setRenderHint(QPainter::Antialiasing);
         painter->setBrush(Qt::NoBrush);
-        QPen pen(tickColor, 3);
+        QPen pen(tickColor, 2);
         pen.setJoinStyle(Qt::MiterJoin);
         painter->setPen(pen);
 
         QRectF markerRect(frameRect);
 
         QPainterPath path;
-        path.moveTo(markerRect.right() - markerRect.width() / 4, markerRect.top() + markerRect.height() / 3);
-        path.lineTo(markerRect.center().x(), markerRect.bottom() - markerRect.height() / 3.0);
-        path.lineTo(markerRect.left() + markerRect.width() / 4, markerRect.center().y());
+        path.moveTo(markerRect.center().x() - 4.4, markerRect.center().y() + 1);
+        path.lineTo(markerRect.center().x() - 1.4, markerRect.center().y() + 3.4);
+        path.lineTo(markerRect.center().x() + 4.2, markerRect.center().y() - 3.1);
 
         painter->setClipRect(markerRect);
         painter->drawPath(path);
         painter->restore();
     } else if (state == CheckPartial) {
-        QPen pen(tickColor, 4);
+        QPen pen(tickColor, 2);
         pen.setCapStyle(Qt::RoundCap);
         painter->setPen(pen);
 
-        QRectF markerRect(frameRect.adjusted(4, 4, -4, -4));
+        QRectF markerRect(frameRect.adjusted(5.5, 5.5, -5.5, -5.5));
 
-        painter->drawLine(markerRect.center() - QPoint(3, 0), markerRect.center() + QPoint(3, 0));
+        painter->drawLine(markerRect.center() - QPoint(4, 0), markerRect.center() + QPoint(4, 0));
     } else if (state == CheckAnimated) {
         painter->save();
         painter->setRenderHint(QPainter::Antialiasing);
         painter->setBrush(Qt::NoBrush);
-        QPen pen(tickColor, 3);
+        QPen pen(tickColor, 2);
         pen.setJoinStyle(Qt::MiterJoin);
         painter->setPen(pen);
 
         QRectF markerRect(frameRect);
 
         QPainterPath path;
-        path.moveTo(markerRect.right() - markerRect.width() / 4, markerRect.top() + markerRect.height() / 3);
-        path.lineTo(markerRect.center().x(), markerRect.bottom() - markerRect.height() / 3.0);
-        path.lineTo(markerRect.left() + markerRect.width() / 4, markerRect.center().y());
-        path.translate(-markerRect.right(), -markerRect.top());
+        path.moveTo(markerRect.center().x() - 4.4, markerRect.center().y() + 1);
+        path.lineTo(markerRect.center().x() - 1.4, markerRect.center().y() + 3.4);
+        path.lineTo(markerRect.center().x() + 4.2, markerRect.center().y() - 3.1);
+        path.translate(-markerRect.left(), -markerRect.bottom());
 
         painter->setClipRect(markerRect.adjusted(1, 1, -1, -1));
-        painter->translate(markerRect.right(), markerRect.top());
+        painter->translate(markerRect.left(), markerRect.bottom());
         painter->scale(animation, 0.5 + 0.5 * animation);
         painter->drawPath(path);
         painter->restore();
@@ -1059,7 +1059,7 @@ void Helper::renderRadioButtonBackground(QPainter *painter, const QRect &rect, c
 
 //______________________________________________________________________________
 void Helper::renderRadioButton(QPainter *painter, const QRect &rect, const QColor &background, const QColor &outline, const QColor &tickColor,
-                               bool sunken, bool enabled, RadioButtonState state, qreal animation, bool mouseOver, bool darkMode, bool inMenu) const
+                               bool sunken, bool enabled, RadioButtonState state, const QPalette &palette, qreal animation, bool mouseOver, bool darkMode, bool inMenu) const
 {
     // setup painter
     painter->setRenderHint(QPainter::Antialiasing, true);
@@ -1114,14 +1114,20 @@ void Helper::renderRadioButton(QPainter *painter, const QRect &rect, const QColo
     } else {
         if (background.isValid()) {
             QLinearGradient gradient(frameRect.bottomLeft(), frameRect.topLeft());
-            gradient.setColorAt(0, background);
-            gradient.setColorAt(1, lighten(background, 0.04));
+            gradient.setColorAt(0, darken(background, 0.014));
+            gradient.setColorAt(1, background);
             painter->setBrush(gradient);
         } else {
             painter->setBrush(Qt::NoBrush);
         }
 
-        painter->setPen(QPen(outline, 1));
+        if (outline.isValid()) {
+            if (!inMenu && state != RadioOff) {
+                painter->setPen(QPen(palette.color(QPalette::Highlight).darker(130), 1));
+            } else {
+                painter->setPen(QPen(outline, 1));
+            }
+        }
 
         QRectF contentRect(frameRect.adjusted(0.5, 0.5, -0.5, -0.5));
         painter->drawEllipse(contentRect);
@@ -1132,12 +1138,12 @@ void Helper::renderRadioButton(QPainter *painter, const QRect &rect, const QColo
         painter->setBrush(tickColor);
         painter->setPen(Qt::NoPen);
 
-        QRectF markerRect(frameRect.adjusted(5, 5, -5, -5));
+        QRectF markerRect(frameRect.adjusted(5.5, 5.5, -5.5, -5.5));
         painter->drawEllipse(markerRect);
     } else if (state == RadioAnimated) {
         painter->setBrush(tickColor);
         painter->setPen(Qt::NoPen);
-        QRectF markerRect(frameRect.adjusted(5, 5, -5, -5));
+        QRectF markerRect(frameRect.adjusted(5.5, 5.5, -5.5, -5.5));
         qreal remaining = markerRect.width() / 2.0 * (1.0 - animation);
         markerRect.adjust(remaining, remaining, -remaining, -remaining);
 

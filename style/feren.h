@@ -101,7 +101,7 @@ namespace Feren
         const bool DockWidgetDrawFrame { false };
         const bool SidePanelDrawFrame { false };
         const bool MenuItemDrawStrongFocus { true };
-        const int WindowDragMode { 0 };
+        const int WindowDragMode { 1 };
         const QStringList WindowDragWhiteList;
         const QStringList WindowDragBlackList;
         const bool UseWMMoveResize { true };
