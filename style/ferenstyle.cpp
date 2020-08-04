@@ -30,6 +30,8 @@
 #include "ferenwindowmanager.h"
 #include "ferenblurhelper.h"
 
+#include <KColorUtils>
+
 #include <QApplication>
 #include <QCheckBox>
 #include <QComboBox>
@@ -1674,6 +1676,8 @@ void Style::loadConfiguration()
     // widget explorer
     _widgetExplorer->setEnabled(Feren::Config::WidgetExplorerEnabled);
     _widgetExplorer->setDrawWidgetRects(Feren::Config::DrawWidgetRects);
+    
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
 }
 
 //___________________________________________________________________________________________________________________
@@ -4283,8 +4287,7 @@ bool Style::drawPushButtonLabelControl(const QStyleOption *option, QPainter *pai
 
         // define color
         //QColor arrowColor(_helper->arrowColor(palette, textRole));
-        QColor arrowColor(textRole);
-        _helper->renderArrow(painter, arrowRect, arrowColor, ArrowDown);
+        _helper->renderArrow(painter, arrowRect, palette.color(textRole), ArrowDown);
     }
 
     // icon size
@@ -7122,13 +7125,15 @@ bool Style::isQtQuickControl(const QStyleOption *option, const QWidget *widget) 
 //____________________________________________________________________
 bool Style::showIconsInMenuItems(void) const
 {
-    return Feren::Settings::ShowIconsInMenuItems && !QCoreApplication::testAttribute(Qt::AA_DontShowIconsInMenus);
+    const KConfigGroup g(KSharedConfig::openConfig(), "KDE");
+    return g.readEntry("ShowIconsInMenuItems", true);
 }
 
 //____________________________________________________________________
 bool Style::showIconsOnPushButtons(void) const
 {
-    return Feren::Settings::ShowIconsOnPushButtons;
+    const KConfigGroup g(KSharedConfig::openConfig(), "KDE");
+    return g.readEntry("ShowIconsOnPushButtons", true);
 }
 
 //____________________________________________________________________
