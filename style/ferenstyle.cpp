@@ -4267,7 +4267,7 @@ bool Style::drawPushButtonLabelControl(const QStyleOption *option, QPainter *pai
         //} else {
         textRole = QPalette::WindowText;
         //}
-    } else if (hasFocus) {
+    } else if (hasFocus && !sunken && !(selected && active)) {
         textRole = QPalette::ButtonText;
     } else if (sunken || (selected && active)) {
         textRole = QPalette::HighlightedText;
