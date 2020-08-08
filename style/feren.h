@@ -188,7 +188,7 @@ namespace Feren
         MenuBarItem_MarginHeight = 5,
 
         // scrollbars
-        ScrollBar_Extend = 14,
+        ScrollBar_Extend = 13,
         ScrollBar_SliderWidth = 8,
         ScrollBar_MinSliderHeight = 24,
         ScrollBar_NoButtonHeight = (ScrollBar_Extend - ScrollBar_SliderWidth) / 2,
