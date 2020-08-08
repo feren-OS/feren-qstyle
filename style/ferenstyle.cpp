@@ -798,8 +798,6 @@ int Style::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *
         return true;
     case SH_DockWidget_ButtonsHaveFrame:
         return false;
-    case SH_ToolTipLabel_Opacity:
-        return 204 ;// Should have 30% transparency
     default:
         return ParentStyleClass::styleHint(hint, option, widget, returnData);
     }
@@ -3742,16 +3740,8 @@ bool Style::drawPanelTipLabelPrimitive(const QStyleOption *option, QPainter *pai
     const QPalette &palette(option->palette);
     QColor background(palette.color(QPalette::ToolTipBase));
     QColor outline(Helper::transparentize(QColor("black"), 0.3));
-    bool hasAlpha(_helper->hasAlphaChannel(widget));
 
-    if (hasAlpha) {
-        int alpha = styleHint(SH_ToolTipLabel_Opacity, option, widget);
-        int h, s, l, a;
-        background.getHsl(&h, &s, &l, &a);
-        background = QColor::fromHsl(h, s, l, alpha);
-    }
-
-    _helper->renderMenuFrame(painter, option->rect, background, outline, hasAlpha);
+    _helper->renderTooltipFrame(painter, option->rect, background, outline);
     return true;
 }
 

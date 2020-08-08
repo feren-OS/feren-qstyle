@@ -298,6 +298,9 @@ public:
     //* menu frame
     void renderMenuFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, bool roundCorners = true) const;
 
+    //* tooltip frame
+    void renderTooltipFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, bool roundCorners = true) const;
+
     //* button frame
     void renderButtonFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, const QColor &shadow, bool focus, bool sunken, bool mouseOver, bool active, const QPalette &palette) const;
 

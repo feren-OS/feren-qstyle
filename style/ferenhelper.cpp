@@ -624,6 +624,26 @@ void Helper::renderMenuFrame(QPainter *painter, const QRect &rect, const QColor 
 }
 
 //______________________________________________________________________________
+void Helper::renderTooltipFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, bool roundCorners) const
+{
+    // set brush
+    if (color.isValid()) 
+        painter->setBrush(color);
+    else
+        painter->setBrush(Qt::NoBrush);
+
+    painter->setRenderHint(QPainter::Antialiasing, false);
+    QRectF frameRect(rect);
+    if (outline.isValid()) {
+        painter->setPen(outline);
+        frameRect.adjust(0.5, 0.5, -0.5, -0.5);
+    } else
+        painter->setPen(Qt::NoPen);
+
+    painter->drawRect(frameRect);
+}
+
+//______________________________________________________________________________
 void Helper::renderButtonFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, const QColor &shadow,
                                bool hasFocus, bool sunken, bool mouseOver, bool active, const QPalette &palette) const
 {
