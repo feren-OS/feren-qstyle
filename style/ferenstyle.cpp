@@ -4559,7 +4559,7 @@ bool Style::drawComboBoxLabelControl(const QStyleOption *option, QPainter *paint
 
             if (!cb->state & QStyle::State_Enabled) {
                 mode = QIcon::Disabled;
-            } else if (cb->state & QStyle::State_Sunken) {
+            } else if (cb->state & (QStyle::State_Sunken | QStyle::State_On)) {
                 mode = QIcon::Selected;
             } else {
                 mode = QIcon::Normal;
