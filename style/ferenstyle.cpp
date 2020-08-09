@@ -3491,12 +3491,7 @@ bool Style::drawIndicatorArrowPrimitive(ArrowOrientation orientation, const QSty
             else
                 color = _helper->arrowColor(palette, arrowHover, false, opacity, animated ? AnimationHover : AnimationNone);
         } else {
-            if (flat) {
-                if (sunken || (selected && active))
-                    color = palette.color(QPalette::HighlightedText);
-                else
-                    color = _helper->arrowColor(palette, QPalette::WindowText);
-            } else if (sunken || (selected && active))  {
+            if (sunken || (selected && active)) {
                 color = palette.color(QPalette::HighlightedText);
             } else {
                 color = _helper->arrowColor(palette, QPalette::ButtonText);
@@ -3547,7 +3542,8 @@ bool Style::drawPanelButtonCommandPrimitive(const QStyleOption *option, QPainter
     if (!buttonOption)
         return true;
 
-    // rect and palette
+    // copy palette and rect
+    const QPalette &palette(option->palette);
     const QRect &rect(option->rect);
 
     // button state
@@ -3567,11 +3563,19 @@ bool Style::drawPanelButtonCommandPrimitive(const QStyleOption *option, QPainter
     AnimationMode mode(_animations->widgetStateEngine().buttonAnimationMode(widget));
     qreal opacity(_animations->widgetStateEngine().buttonOpacity(widget));
 
+    QColor shadow(palette.color(QPalette::Shadow));
+    QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode, _dark));
+    QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark));
+
     if (flat) {
         // define colors and render
         const QPalette &palette(option->palette);
         QColor color(_helper->toolButtonColor(palette, mouseOver, hasFocus, sunken, opacity, mode));
-        _helper->renderToolButtonFrame(painter, rect, color, sunken);
+        if (mouseOver || sunken) {
+            _helper->renderButtonFrame(painter, rect, background, outline, shadow, hasFocus, sunken, mouseOver, windowActive, palette);
+        } else {
+            _helper->renderToolButtonFrame(painter, rect, color, sunken);
+        }
     } else {
         // update button color from palette in case button is default
         QPalette palette(option->palette);
@@ -3580,10 +3584,6 @@ bool Style::drawPanelButtonCommandPrimitive(const QStyleOption *option, QPainter
             QColor base(palette.color(QPalette::Base));
             palette.setColor(QPalette::Button, Helper::mix(button, base, 0.7));
         }
-
-        QColor shadow(palette.color(QPalette::Shadow));
-        QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode, _dark));
-        QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark));
 
         // render
         _helper->renderButtonFrame(painter, rect, background, outline, shadow, hasFocus, sunken, mouseOver, enabled && windowActive, palette);
@@ -3614,16 +3614,16 @@ bool Style::drawPanelButtonToolPrimitive(const QStyleOption *option, QPainter *p
      */
     AnimationMode mode(_animations->widgetStateEngine().buttonAnimationMode(widget));
     qreal opacity(_animations->widgetStateEngine().buttonOpacity(widget));
+    
+    // render as push button
+    QColor shadow(_helper->shadowColor(palette));
+    QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode, _dark));
+    QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark));
 
     if (!autoRaise || mouseOver || sunken) {
         // need to check widget for popup mode, because option is not set properly
         const QToolButton *toolButton(qobject_cast<const QToolButton *>(widget));
         bool hasPopupMenu(toolButton && toolButton->popupMode() == QToolButton::MenuButtonPopup);
-
-        // render as push button
-        QColor shadow(_helper->shadowColor(palette));
-        QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode, _dark));
-        QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark));
 
         // adjust frame in case of menu
         if (hasPopupMenu) {
@@ -4251,13 +4251,7 @@ bool Style::drawPushButtonLabelControl(const QStyleOption *option, QPainter *pai
 
     // color role
     QPalette::ColorRole textRole;
-    if (flat) {
-        //if (hasFocus && sunken) {
-        //    textRole = QPalette::HighlightedText;
-        //} else {
-        textRole = QPalette::WindowText;
-        //}
-    } else if (hasFocus && !sunken && !(selected && active)) {
+    if (hasFocus && !sunken && !(selected && active)) {
         textRole = QPalette::ButtonText;
     } else if (sunken || (selected && active)) {
         textRole = QPalette::HighlightedText;
@@ -4362,10 +4356,7 @@ bool Style::drawToolButtonLabelControl(const QStyleOption *option, QPainter *pai
 
     // focus flag is set to match the background color in either renderButtonFrame or renderToolButtonFrame
     bool hasFocus(false);
-    if (flat)
-        hasFocus = enabled && !mouseOver && (option->state & State_HasFocus);
-    else
-        hasFocus = enabled && !mouseOver && (option->state & (State_HasFocus | State_Sunken));
+    hasFocus = enabled && !mouseOver && (option->state & (State_HasFocus | State_Sunken));
 
     bool hasArrow(toolButtonOption->features & QStyleOptionToolButton::Arrow);
     bool hasIcon(!(hasArrow || toolButtonOption->icon.isNull()));
@@ -4455,9 +4446,7 @@ bool Style::drawToolButtonLabelControl(const QStyleOption *option, QPainter *pai
     // render text
     if (hasText && textRect.isValid()) {
         QPalette::ColorRole textRole(QPalette::ButtonText);
-        if (flat)
-            textRole = (sunken || (active && selected)) ? QPalette::HighlightedText : QPalette::WindowText;
-        else if (sunken || (active && selected))
+        if (sunken || (active && selected))
             textRole = QPalette::HighlightedText;
 
         painter->setFont(toolButtonOption->font);
@@ -6012,9 +6001,9 @@ bool Style::drawToolButtonComplexControl(const QStyleOptionComplex *option, QPai
         } else if (sunken && hasPopupMenu && !(toolButtonOption->activeSubControls & SC_ToolButton)) {
             // Only menu button is active. so draw left hand side od button raised
             QStyleOptionToolButton btn(copy);
-            btn.state |= State_Raised;
-            btn.state &= ~State_Sunken;
-            btn.state &= ~State_AutoRaise;
+            //btn.state |= State_Raised;
+            //btn.state &= ~State_Sunken;
+            //btn.state &= ~State_AutoRaise;
             drawPrimitive(PE_PanelButtonTool, &btn, painter, widget);
         } else {
             drawPrimitive(PE_PanelButtonTool, &copy, painter, widget);
@@ -6121,7 +6110,7 @@ bool Style::drawComboBoxComplexControl(const QStyleOptionComplex *option, QPaint
             } else {
                 AnimationMode mode(_animations->inputWidgetEngine().buttonAnimationMode(widget));
                 qreal opacity(_animations->inputWidgetEngine().buttonOpacity(widget));
-
+                
                 // define colors
                 QColor shadow(_helper->shadowColor(palette));
                 QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode, _dark));
@@ -6138,11 +6127,19 @@ bool Style::drawComboBoxComplexControl(const QStyleOptionComplex *option, QPaint
         } else {
             AnimationMode mode(_animations->inputWidgetEngine().buttonAnimationMode(widget));
             qreal opacity(_animations->inputWidgetEngine().buttonOpacity(widget));
+            // define colors
+            QColor shadow(_helper->shadowColor(palette));
+            QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode, _dark));
+            QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark));
 
             if (flat) {
                 // define colors and render
                 QColor color(_helper->toolButtonColor(palette, mouseOver, hasFocus, sunken, opacity, mode));
-                _helper->renderToolButtonFrame(painter, rect, color, sunken);
+                if (mouseOver || sunken) {
+                    _helper->renderButtonFrame(painter, rect, background, outline, shadow, hasFocus, sunken, mouseOver, windowActive, palette);
+                } else {
+                    _helper->renderToolButtonFrame(painter, rect, color, sunken);
+                }
             } else {
                 // define colors
                 QColor shadow(_helper->shadowColor(palette));
