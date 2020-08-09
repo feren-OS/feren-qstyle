@@ -26,6 +26,9 @@
 #include "ferenanimationdata.h"
 #include "config-feren.h"
 
+#include <KColorScheme>
+#include <KSharedConfig>
+
 #include <QPainterPath>
 #include <QStyle>
 #include <QWidget>
@@ -427,6 +430,10 @@ public:
 
     //* return device pixel ratio for a given pixmap
     virtual qreal devicePixelRatio(const QPixmap &) const;
+    
+    
+    QPixmap coloredIcon(const QIcon &icon, const QPalette& palette, const QSize &size,
+                        QIcon::Mode mode = QIcon::Normal, QIcon::State state = QIcon::Off);
 
     //@}
 

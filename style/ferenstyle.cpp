@@ -4018,7 +4018,7 @@ bool Style::drawIndicatorTabClosePrimitive(const QStyleOption *option, QPainter 
     QSize iconSize(iconWidth, iconWidth);
 
     // get pixmap
-    QPixmap pixmap(icon.pixmap(iconSize, iconMode, iconState));
+    const QPixmap pixmap(_helper->coloredIcon(icon, option->palette, iconSize, iconMode, iconState));
 
     // render
     drawItemPixmap(painter, option->rect, Qt::AlignCenter, pixmap);
@@ -4326,12 +4326,11 @@ bool Style::drawPushButtonLabelControl(const QStyleOption *option, QPainter *pai
         const QIcon::State iconState( sunken ? QIcon::On : QIcon::Off );
         QIcon::Mode iconMode;
         if( !enabled ) iconMode = QIcon::Disabled;
-        else if( !flat && hasFocus ) iconMode = QIcon::Selected;
-        else if( mouseOver && flat ) iconMode = QIcon::Active;
+        else if(sunken || (selected && active)) iconMode = QIcon::Selected;
         else iconMode = QIcon::Normal;
 
-        QPixmap pixmap = buttonOption->icon.pixmap(iconSize, iconMode, iconState);
-        drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
+        const auto pixmap = _helper->coloredIcon(buttonOption->icon, buttonOption->palette, iconSize, iconMode, iconState);
+        drawItemPixmap( painter, iconRect, Qt::AlignCenter, pixmap );
     }
 
     // render text
@@ -4445,17 +4444,12 @@ bool Style::drawToolButtonLabelControl(const QStyleOption *option, QPainter *pai
         // icon state and mode
         const QIcon::State iconState(sunken ? QIcon::On : QIcon::Off);
         QIcon::Mode iconMode;
-        if (!enabled)
-            iconMode = QIcon::Disabled;
-        else if (!flat && hasFocus)
-            iconMode = QIcon::Selected;
-        else if (mouseOver && flat)
-            iconMode = QIcon::Active;
-        else
-            iconMode = QIcon::Normal;
+        if( !enabled ) iconMode = QIcon::Disabled;
+        else if(sunken || (selected && active)) iconMode = QIcon::Selected;
+        else iconMode = QIcon::Normal;
 
-        QPixmap pixmap = toolButtonOption->icon.pixmap(iconSize, iconMode, iconState);
-        drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
+        const QPixmap pixmap = _helper->coloredIcon(toolButtonOption->icon, toolButtonOption->palette, iconSize, iconMode, iconState);
+        drawItemPixmap( painter, iconRect, Qt::AlignCenter, pixmap );
     }
 
     // render text
@@ -4563,15 +4557,15 @@ bool Style::drawComboBoxLabelControl(const QStyleOption *option, QPainter *paint
         if (!cb->currentIcon.isNull() && qobject_cast<const QComboBox *>(widget)) {
             QIcon::Mode mode;
 
-            if ((cb->state & QStyle::State_Selected) && (cb->state & QStyle::State_Active)) {
-                mode = QIcon::Selected;
-            } else if (cb->state & QStyle::State_Enabled) {
-                mode = QIcon::Normal;
-            } else {
+            if (!cb->state & QStyle::State_Enabled) {
                 mode = QIcon::Disabled;
+            } else if (cb->state & QStyle::State_Sunken) {
+                mode = QIcon::Selected;
+            } else {
+                mode = QIcon::Normal;
             }
 
-            QPixmap pixmap = cb->currentIcon.pixmap(widget->windowHandle(), cb->iconSize, mode);
+            const QPixmap pixmap = _helper->coloredIcon(cb->currentIcon,cb->palette, cb->iconSize, mode);
             QRect iconRect(editRect);
             iconRect.setWidth(cb->iconSize.width() + 4);
             iconRect = alignedRect(cb->direction,
@@ -6649,8 +6643,8 @@ bool Style::drawTitleBarComplexControl(const QStyleOptionComplex *option, QPaint
         }
 
         // get pixmap and render
-        QPixmap pixmap = icon.pixmap(iconSize, iconMode, iconState);
-        painter->drawPixmap(iconRect, pixmap);
+        const QPixmap pixmap = _helper->coloredIcon(icon, option->palette, iconSize, iconMode, iconState);
+        painter->drawPixmap( iconRect, pixmap );
     }
 
     return true;

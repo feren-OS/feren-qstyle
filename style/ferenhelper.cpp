@@ -23,6 +23,8 @@
 
 #include "feren.h"
 
+#include <KColorUtils>
+#include <KIconLoader>
 #include <KWindowSystem>
 
 #include <QApplication>
@@ -1661,12 +1663,25 @@ QPixmap Helper::highDpiPixmap(int width, int height) const
 //______________________________________________________________________________________
 qreal Helper::devicePixelRatio(const QPixmap &pixmap) const
 {
-#if QT_VERSION >= 0x050300
     return pixmap.devicePixelRatio();
-#else
-    Q_UNUSED(pixmap);
-    return 1;
-#endif
+}
+
+QPixmap Helper::coloredIcon(const QIcon& icon,  const QPalette& palette, const QSize &size, QIcon::Mode mode, QIcon::State state)
+{
+    const QPalette activePalette = KIconLoader::global()->customPalette();
+    const bool changePalette = activePalette != palette;
+    if (changePalette) {
+        KIconLoader::global()->setCustomPalette(palette);
+    }
+    const QPixmap pixmap = icon.pixmap(size, mode, state);
+    if (changePalette) {
+        if (activePalette == QPalette()) {
+            KIconLoader::global()->resetPalette();
+        } else {
+            KIconLoader::global()->setCustomPalette(activePalette);
+        }
+    }
+    return pixmap;
 }
 
 #if ADWAITA_HAVE_X11
