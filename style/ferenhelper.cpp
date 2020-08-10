@@ -604,11 +604,11 @@ void Helper::renderButtonFrame(QPainter *painter, const QRect &rect, const QColo
             gradient.setColorAt(1, background);
         } else if (mouseOver) {
             // Hovered button in normal mode is a gradient from $color to lighten(bg_color, 0.01)
-            gradient.setColorAt(0, lighten(color, 0.002));
-            gradient.setColorAt(1, lighten(color, 0.008));
+            gradient.setColorAt(0, lighten(color, 0.01));
+            gradient.setColorAt(1, lighten(color, 0.04));
         } else {
             // Normal button in normal mode is a gradient from $color to bg_color
-            gradient.setColorAt(0, lighten(color, 0.006));
+            gradient.setColorAt(0, darken(color, 0.03));
             gradient.setColorAt(1, color);
         }
         painter->setBrush(gradient);
