@@ -65,19 +65,14 @@ void Helper::loadConfig()
 QColor Helper::indicatorOutlineColor(const QPalette &palette, bool mouseOver, bool hasFocus, qreal opacity, AnimationMode mode, CheckBoxState state, bool darkMode, bool inMenu) const
 {
     bool isDisabled = palette.currentColorGroup() == QPalette::Disabled;
-    if (inMenu || state == CheckBoxState::CheckOff) {
-
-        if (isDisabled) {
-            return buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode, darkMode);
-        }
-
-        if (darkMode) {
-            return darken(palette.color(QPalette::Window), 0.18);
-        } else {
-            return darken(palette.color(QPalette::Window), 0.24);
-        }
+    if (inMenu) {
+        return palette.color(QPalette::Text);
+    } else if (isDisabled) {
+        return buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode, darkMode);
+    } else if (state == CheckBoxState::CheckOff) {
+        return menuOutlineColor(palette);
     } else {
-        return palette.color(QPalette::Highlight);
+        return darken(palette.color(QPalette::Highlight), 0.014);
     }
 }
 
@@ -189,7 +184,7 @@ QColor Helper::buttonBackgroundColor(const QPalette &palette, bool mouseOver, bo
 QColor Helper::indicatorBackgroundColor(const QPalette &palette, bool mouseOver, bool hasFocus, bool sunken, qreal opacity, AnimationMode mode, CheckBoxState state, bool darkMode, bool inMenu) const
 {
     bool isDisabled = palette.currentColorGroup() == QPalette::Disabled;
-    QColor background(palette.color(QPalette::Background));
+    QColor background(palette.color(QPalette::Base));
     // Normal-alt button for dark mode is darken(bg_color, 0.03)
     // Normal-alt button for normal mode is lighten(bg_color, 0.05)
 
@@ -260,21 +255,11 @@ QColor Helper::scrollBarHandleColor(const QPalette &palette, bool mouseOver, boo
     QColor selectedBgColor = palette.color(QPalette::Highlight);
 
     QColor color(mix(fgColor, bgColor, 0.4));
-    QColor hoverColor(mix(fgColor, bgColor, 0.2));
-    QColor activeColor(darkMode ? lighten(selectedBgColor, 0.1) : darken(selectedBgColor, 0.1));
+    QColor activeColor(selectedBgColor);
 
     // hover takes precedence over focus
-    if (mode == AnimationPressed) {
-        if (mouseOver)
-            color = mix(hoverColor, activeColor, opacity);
-        else
-            color = mix(color, activeColor, opacity);
-    } else if (sunken) {
+    if (sunken || (mode == AnimationPressed) || (mode == AnimationHover) || mouseOver) {
         color = activeColor;
-    } else if (mode == AnimationHover) {
-        color = mix(color, hoverColor, opacity);
-    } else if (mouseOver) {
-        color = hoverColor;
     }
 
     return color;
@@ -674,7 +659,14 @@ void Helper::renderCheckBoxFrame(QPainter *painter, const QRect &rect, const QCo
     } else
         painter->setPen(Qt::NoPen);
 
-    if (inMenu || state == CheckOff) {
+    if (inMenu) {
+        // content
+        if (color.isValid()) {
+            painter->setBrush(palette.color(QPalette::Base));
+        } else {
+            painter->setBrush(Qt::NoBrush);
+        }
+    } else if (state == CheckOff) {
         // content
         if (color.isValid()) {
             painter->setBrush(color);
@@ -977,8 +969,6 @@ void Helper::renderRadioButtonBackground(QPainter *painter, const QRect &rect, c
     // copy rect
     QRectF frameRect(rect);
     frameRect.adjust(3, 3, -3, -3);
-    if (sunken)
-        frameRect.translate(1, 1);
 
     painter->setPen(outline);
     painter->setBrush(color);
