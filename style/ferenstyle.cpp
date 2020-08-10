@@ -6481,7 +6481,7 @@ bool Style::drawScrollBarComplexControl(const QStyleOptionComplex *option, QPain
 
         const QPalette &palette(option->palette);
         QColor color;
-        color = _helper->mix(palette.color(QPalette::Window), palette.color(QPalette::Text), 0.03);
+        color = palette.color(QPalette::Window);
 
         const State &state(option->state);
         bool horizontal(state & State_Horizontal);
