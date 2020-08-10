@@ -380,7 +380,7 @@ public:
     }
 
     //* tabbar tab
-    void renderTabBarTab(QPainter *painter, const QRect &rect, const QColor &background, const QColor &color, const QColor &outline, Corners, bool renderFrame) const;
+    void renderTabBarTab(QPainter *painter, const QRect &rect, const QColor &background, const QColor &color, const QColor &outline, const QPalette &palette, Corners, bool renderFrame, bool selected, bool mouseOver) const;
 
     //* generic arrow
     void renderArrow(QPainter *painter, const QRect &rect, const QColor &, ArrowOrientation) const;

@@ -307,12 +307,7 @@ QColor Helper::headerTextColor(const QPalette &palette, const QStyle::State stat
 
 QColor Helper::tabBarColor(const QPalette &palette, const QStyle::State state) const
 {
-    QColor background(mix(palette.window().color(), palette.shadow().color(), 0.15));
-    if (!(state & QStyle::State_Enabled))
-        background = background.lighter(115);
-    if (!(state & QStyle::State_Active))
-        background = background.lighter(115);
-    return background;
+    return palette.color(QPalette::Base);
 }
 
 //______________________________________________________________________________
@@ -1273,7 +1268,7 @@ void Helper::renderScrollBarHandle(QPainter *painter, const QRect &rect, const Q
 }
 
 //______________________________________________________________________________
-void Helper::renderTabBarTab(QPainter *painter, const QRect &rect, const QColor &background, const QColor &color, const QColor &outline, Corners corners, bool renderFrame) const
+void Helper::renderTabBarTab(QPainter *painter, const QRect &rect, const QColor &background, const QColor &color, const QColor &outline, const QPalette &palette, Corners corners, bool renderFrame, bool selected, bool mouseOver) const
 {
     // setup painter
     painter->setRenderHint(QPainter::Antialiasing, false);
@@ -1287,28 +1282,33 @@ void Helper::renderTabBarTab(QPainter *painter, const QRect &rect, const QColor 
         frameRect.adjust(1.0, 1.0, -1.0, -1.0);
         adjustment = 0;
 
-        painter->setBrush(background);
+        if (selected) {
+            painter->setBrush(mix(background, palette.color(QPalette::Text), 0.07));
+        } else {
+            painter->setBrush(background);
+        }
 
         // render
         painter->drawRect(frameRect);
     } else if (!renderFrame) {
-        adjustment = 9;
+        adjustment = 7;
     }
 
-    painter->setPen(QPen(color, 6));
+    //FIXME: Why is this different heights when it's the SAME line no matter the state (and colour)?
+    painter->setPen(QPen(color, 4));
 
     switch (corners) {
     case CornersTop:
-        painter->drawLine(frameRect.left() + adjustment, frameRect.bottom(), frameRect.right() - adjustment, frameRect.bottom());
+        painter->drawLine(frameRect.bottomLeft(), frameRect.bottomRight());
         break;
     case CornersBottom:
-        painter->drawLine(frameRect.left() + adjustment, frameRect.top(), frameRect.right() - adjustment, frameRect.top());
+        painter->drawLine(frameRect.topLeft(), frameRect.topRight());
         break;
     case CornersLeft:
-        painter->drawLine(frameRect.right(), frameRect.top() + adjustment, frameRect.right(), frameRect.bottom() - adjustment);
+        painter->drawLine(frameRect.topRight(), frameRect.bottomRight());
         break;
     case CornersRight:
-        painter->drawLine(frameRect.left(), frameRect.top() + adjustment, frameRect.left(), frameRect.bottom() - adjustment);
+        painter->drawLine(frameRect.topLeft(), frameRect.bottomLeft());
         break;
     }
 }

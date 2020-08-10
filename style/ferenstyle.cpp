@@ -5458,16 +5458,15 @@ bool Style::drawTabBarTabLabelControl(const QStyleOption *option, QPainter *pain
         }
 
         QFont font = painter->font();
-        font.setBold(true);
         painter->setFont(font);
         if (!(tabV2.state & State_Enabled)) {
             if (tabV2.state & State_Selected)
-                painter->setPen(Helper::mix(option->palette.brush(QPalette::Text).color(), option->palette.brush(QPalette::Window).color(), 0.3));
+                painter->setPen(Helper::mix(option->palette.brush(QPalette::Text).color(), option->palette.brush(QPalette::Base).color(), 0.3));
             else
-                painter->setPen(Helper::mix(option->palette.brush(QPalette::Text).color(), option->palette.brush(QPalette::Window).color(), 0.4));
+                painter->setPen(Helper::mix(option->palette.brush(QPalette::Text).color(), option->palette.brush(QPalette::Base).color(), 0.4));
         } else {
             if (tabV2.state & State_Selected)
-                painter->setPen(option->palette.brush(QPalette::WindowText).color());
+                painter->setPen(option->palette.brush(QPalette::Text).color());
             else if (tabV2.state & State_Active && tabV2.state & State_MouseOver)
                 painter->setPen(Helper::mix(option->palette.brush(QPalette::Dark).color(), option->palette.brush(QPalette::Text).color(), 0.7));
             else
@@ -5566,7 +5565,7 @@ bool Style::drawTabBarTabShapeControl(const QStyleOption *option, QPainter *pain
     const State &state(option->state);
     bool enabled(state & State_Enabled);
     bool selected(state & State_Selected);
-    bool mouseOver((state & State_Active) && !selected && (state & State_MouseOver) && enabled);
+    bool mouseOver( enabled && !selected && ( state & State_MouseOver ) );
 
     // check if tab is being dragged
     bool isDragged(widget && selected && painter->device() != widget);
@@ -5640,21 +5639,27 @@ bool Style::drawTabBarTabShapeControl(const QStyleOption *option, QPainter *pain
     }
 
     // underline
-    QColor underline(enabled && selected ? _helper->focusColor(palette) : selected || mouseOver ? option->palette.color(QPalette::Window).darker() : Qt::transparent);
+    QColor underline(enabled && selected ? option->palette.color(QPalette::Highlight) : selected || mouseOver ? _helper->menuOutlineColor(palette) : Qt::transparent);
 
     // outline
     QColor outline = QColor();
     if (selected && widget && widget->property("movable").toBool()) {
         outline = _helper->frameOutlineColor(palette);
     }
-
+    
     // background
-    QColor background = _helper->tabBarColor(option->palette, option->state);
-
+    QColor background = QColor();
+    //FIXME: Why is mouseOver being entirely disregarded?
+    if (mouseOver) {
+        background = _helper->alphaColor( option->palette.color(QPalette::Window), 0.2 );
+    } else {
+        background = option->palette.color(QPalette::Base);
+    }
+    
     // render
     QRegion oldRegion(painter->clipRegion());
     painter->setClipRect(option->rect, Qt::IntersectClip);
-    _helper->renderTabBarTab(painter, rect, background, underline, outline, corners, widget && widget->property("movable").toBool());
+    _helper->renderTabBarTab(painter, rect, background, underline, outline, palette, corners, widget && widget->property("movable").toBool(), (enabled && selected), mouseOver);
     painter->setClipRegion(oldRegion);
 
     return true;
@@ -6502,10 +6507,12 @@ bool Style::drawScrollBarComplexControl(const QStyleOptionComplex *option, QPain
             //Separator lines akin to the GTK3 theme 'cos contrast
             if (horizontal) {
                 painter->drawLine(option->rect.topLeft(), option->rect.topRight());
-                painter->drawLine(option->rect.bottomLeft(), option->rect.bottomRight());
             } else {
-                painter->drawLine(option->rect.topLeft(), option->rect.bottomLeft());
-                painter->drawLine(option->rect.topRight(), option->rect.bottomRight());
+                if (option->direction == Qt::RightToLeft) {
+                    painter->drawLine(option->rect.topRight(), option->rect.bottomRight());
+                } else {
+                    painter->drawLine(option->rect.topLeft(), option->rect.bottomLeft());
+                }
             }
             painter->setPen(Qt::NoPen);
         }
