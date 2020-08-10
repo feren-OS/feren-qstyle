@@ -648,7 +648,7 @@ void Helper::renderCheckBoxFrame(QPainter *painter, const QRect &rect, const QCo
     if (outline.isValid()) {
         if (inMenu) {
             painter->setPen(QPen(palette.color(QPalette::Text), 1.0));
-        } else if (state == CheckOn) {
+        } else if (state != CheckOff) {
             painter->setPen(QPen(palette.color(QPalette::Highlight).darker(130), 1.0));
         } else {
             painter->setPen(QPen(outline, 1.0));

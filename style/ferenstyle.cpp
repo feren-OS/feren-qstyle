@@ -6486,16 +6486,28 @@ bool Style::drawScrollBarComplexControl(const QStyleOptionComplex *option, QPain
         const State &state(option->state);
         bool horizontal(state & State_Horizontal);
 
-        if (horizontal)
+        if (horizontal) {
             grooveRect = centerRect(grooveRect, grooveRect.width(), Metrics::ScrollBar_SliderWidth);
-        else
+        } else {
             grooveRect = centerRect(grooveRect, Metrics::ScrollBar_SliderWidth, grooveRect.height());
+        }
 
         // render
         if (enabled) {
             painter->setPen(Qt::NoPen);
             painter->setBrush(color);
             painter->drawRect(option->rect);
+            
+            painter->setPen(_helper->menuOutlineColor(palette));
+            //Separator lines akin to the GTK3 theme 'cos contrast
+            if (horizontal) {
+                painter->drawLine(option->rect.topLeft(), option->rect.topRight());
+                painter->drawLine(option->rect.bottomLeft(), option->rect.bottomRight());
+            } else {
+                painter->drawLine(option->rect.topLeft(), option->rect.bottomLeft());
+                painter->drawLine(option->rect.topRight(), option->rect.bottomRight());
+            }
+            painter->setPen(Qt::NoPen);
         }
     }
 
