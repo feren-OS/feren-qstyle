@@ -190,6 +190,10 @@ public:
         return palette.color(active ? QPalette::Active : QPalette::Inactive, QPalette::WindowText);
     }
 
+    //* colorspublic
+    QColor darkeningBG() const;
+    QColor borderGeneric() const;
+
     //* indicator outline color
     QColor indicatorOutlineColor(const QPalette &palette, bool mouseOver = false, bool hasFocus = false, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone, CheckBoxState state = CheckOff, bool darkMode = false, bool inMenu = false) const;
 
@@ -353,16 +357,16 @@ public:
     void renderDialContents(QPainter *painter, const QRect &rect, const QColor &, qreal first, qreal second) const;
 
     //* progress bar groove
-    void renderProgressBarGroove(QPainter *painter, const QRect &rect, const QColor &, const QColor &) const;
+    void renderProgressBarGroove(QPainter *painter, const QRect &rect, const QColor &, const QColor &, bool decover = false) const;
 
     //* progress bar contents
     void renderProgressBarContents(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline) const
     {
-        return renderProgressBarGroove(painter, rect, color, outline);
+        return renderProgressBarGroove(painter, rect, color, outline, true);
     }
 
     //* progress bar contents (animated)
-    void renderProgressBarBusyContents(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, bool horizontal, bool reverse, int progress) const;
+    void renderProgressBarBusyContents(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, bool horizontal, bool reverse, int progress, bool decover = false) const;
 
     //* scrollbar groove
     void renderScrollBarGroove(QPainter *painter, const QRect &rect, const QColor &color) const

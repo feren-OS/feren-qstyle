@@ -62,6 +62,17 @@ void Helper::loadConfig()
 }
 
 //____________________________________________________________________
+QColor Helper::darkeningBG() const
+{
+    QColor col( 0,0,0 );
+    return alphaColor(col, 0.08);
+}
+QColor Helper::borderGeneric() const
+{
+    QColor col( 0,0,0 );
+    return alphaColor(col, 0.19);
+}
+
 QColor Helper::indicatorOutlineColor(const QPalette &palette, bool mouseOver, bool hasFocus, qreal opacity, AnimationMode mode, CheckBoxState state, bool darkMode, bool inMenu) const
 {
     bool isDisabled = palette.currentColorGroup() == QPalette::Disabled;
@@ -72,7 +83,7 @@ QColor Helper::indicatorOutlineColor(const QPalette &palette, bool mouseOver, bo
     } else if (state == CheckBoxState::CheckOff) {
         return menuOutlineColor(palette);
     } else {
-        return darken(palette.color(QPalette::Highlight), 0.014);
+        return darken(palette.color(QPalette::Highlight), 0.005);
     }
 }
 
@@ -616,7 +627,7 @@ void Helper::renderButtonFrame(QPainter *painter, const QRect &rect, const QColo
     if (sunken) {
         // TODO: false is for _dark
         QColor outline2(indicatorOutlineColor(palette, mouseOver, false, AnimationData::OpacityInvalid, AnimationNone, CheckOn, false));
-        painter->setPen(outline2.darker(130));
+        painter->setPen(outline2.darker(118));
     }
 
     // render
@@ -645,7 +656,7 @@ void Helper::renderCheckBoxFrame(QPainter *painter, const QRect &rect, const QCo
         if (inMenu) {
             painter->setPen(QPen(palette.color(QPalette::Text), 1.0));
         } else if (state != CheckOff) {
-            painter->setPen(QPen(palette.color(QPalette::Highlight).darker(130), 1.0));
+            painter->setPen(QPen(palette.color(QPalette::Highlight).darker(118), 1.0));
         } else {
             painter->setPen(QPen(outline, 1.0));
         }
@@ -986,7 +997,7 @@ void Helper::renderRadioButton(QPainter *painter, const QRect &rect, const QColo
         if (inMenu) {
             painter->setPen(QPen(palette.color(QPalette::Text), 1.0));
         } else if (state == RadioOn) {
-            painter->setPen(QPen(palette.color(QPalette::Highlight).darker(130), 1.0));
+            painter->setPen(QPen(palette.color(QPalette::Highlight).darker(118), 1.0));
         } else {
             painter->setPen(QPen(outline, 1.0));
         }
@@ -1163,45 +1174,45 @@ void Helper::renderSliderHandle(QPainter *painter, const QRect &rect, const QCol
     circle.addEllipse(r);
     circle.closeSubpath();
 
-    if (ticks & SideBottom) {
-        QPainterPath triangle(r.center());
-        triangle.moveTo(r.left() + 1.5, r.center().y() + 5.5);
-        triangle.lineTo(r.center().x() + 1, r.bottom() + 4.5);
-        triangle.lineTo(r.right() - 0.5, r.center().y() + 5.5);
-        triangle.closeSubpath();
-        circle = circle.united(triangle);
-    } else if (ticks & SideTop) {
-        QPainterPath triangle(r.center());
-        triangle.moveTo(r.left() + 1.5, r.center().y() - 3.5);
-        triangle.lineTo(r.center().x() + 1, r.top() - 2.5);
-        triangle.lineTo(r.right() - 0.5, r.center().y() - 3.5);
-        triangle.closeSubpath();
-        circle = circle.united(triangle);
-    } else if (ticks & SideLeft) {
-        QPainterPath triangle(r.center());
-        triangle.moveTo(r.center().x() - 3.5, r.top() + 1.5);
-        triangle.lineTo(r.left() - 2.5, r.center().y() + 1);
-        triangle.lineTo(r.center().x() - 3.5, r.bottom() - 0.5);
-        triangle.closeSubpath();
-        circle = circle.united(triangle);
-    } else if (ticks & SideRight) {
-        QPainterPath triangle(r.center());
-        triangle.moveTo(r.center().x() + 3.5, r.top() + 1.5);
-        triangle.lineTo(r.right() + 2.5, r.center().y() + 1);
-        triangle.lineTo(r.center().x() + 3.5, r.bottom() - 0.5);
-        triangle.closeSubpath();
-        circle = circle.united(triangle);
-    }
+//     if (ticks & SideBottom) {
+//         QPainterPath triangle(r.center());
+//         triangle.moveTo(r.left() + 1.5, r.center().y() + 5.5);
+//         triangle.lineTo(r.center().x() + 1, r.bottom() + 4.5);
+//         triangle.lineTo(r.right() - 0.5, r.center().y() + 5.5);
+//         triangle.closeSubpath();
+//         circle = circle.united(triangle);
+//     } else if (ticks & SideTop) {
+//         QPainterPath triangle(r.center());
+//         triangle.moveTo(r.left() + 1.5, r.center().y() - 3.5);
+//         triangle.lineTo(r.center().x() + 1, r.top() - 2.5);
+//         triangle.lineTo(r.right() - 0.5, r.center().y() - 3.5);
+//         triangle.closeSubpath();
+//         circle = circle.united(triangle);
+//     } else if (ticks & SideLeft) {
+//         QPainterPath triangle(r.center());
+//         triangle.moveTo(r.center().x() - 3.5, r.top() + 1.5);
+//         triangle.lineTo(r.left() - 2.5, r.center().y() + 1);
+//         triangle.lineTo(r.center().x() - 3.5, r.bottom() - 0.5);
+//         triangle.closeSubpath();
+//         circle = circle.united(triangle);
+//     } else if (ticks & SideRight) {
+//         QPainterPath triangle(r.center());
+//         triangle.moveTo(r.center().x() + 3.5, r.top() + 1.5);
+//         triangle.lineTo(r.right() + 2.5, r.center().y() + 1);
+//         triangle.lineTo(r.center().x() + 3.5, r.bottom() - 0.5);
+//         triangle.closeSubpath();
+//         circle = circle.united(triangle);
+//     }
 
-    QTransform rotate;
-    rotate.translate(frameRect.center().x(), frameRect.center().y());
-    rotate.rotate(angle);
-    rotate.translate(-frameRect.center().x(), -frameRect.center().y());
+     QTransform rotate;
+//     rotate.translate(frameRect.center().x(), frameRect.center().y());
+//     rotate.rotate(angle);
+//     rotate.translate(-frameRect.center().x(), -frameRect.center().y());
     painter->drawPolygon(circle.toFillPolygon(rotate));
 }
 
 //______________________________________________________________________________
-void Helper::renderProgressBarGroove(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline) const
+void Helper::renderProgressBarGroove(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, bool decover) const
 {
     // setup painter
     painter->setRenderHint(QPainter::Antialiasing, true);
@@ -1215,6 +1226,11 @@ void Helper::renderProgressBarGroove(QPainter *painter, const QRect &rect, const
         painter->setPen(outline);
         painter->setBrush(color);
         painter->drawRoundedRect(baseRect.translated(0.5, 0.5), radius, radius);
+        if (decover) {
+            painter->setBrush(Qt::NoBrush);
+            painter->setPen(borderGeneric());
+            painter->drawRoundedRect(baseRect.translated(0.5, 0.5), radius, radius);
+        }
     }
 
     return;
@@ -1223,7 +1239,7 @@ void Helper::renderProgressBarGroove(QPainter *painter, const QRect &rect, const
 
 //______________________________________________________________________________
 void Helper::renderProgressBarBusyContents(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline,
-                                           bool horizontal, bool reverse, int progress) const
+                                           bool horizontal, bool reverse, int progress, bool decover) const
 {
     Q_UNUSED(reverse);
 
@@ -1244,6 +1260,11 @@ void Helper::renderProgressBarBusyContents(QPainter *painter, const QRect &rect,
     painter->setBrush(color);
     painter->setPen(outline);
     painter->drawRoundedRect(contentRect.translated(0.5, 0.5), radius, radius);
+    if (decover) {
+        painter->setBrush(Qt::NoBrush);
+        painter->setPen(borderGeneric());
+        painter->drawRoundedRect(contentRect.translated(0.5, 0.5), radius, radius);
+    }
 
     return;
 }

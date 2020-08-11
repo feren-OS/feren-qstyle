@@ -5011,8 +5011,7 @@ bool Style::drawProgressBarContentsControl(const QStyleOption *option, QPainter 
     if (busy) {
         qreal progress(_animations->busyIndicatorEngine().value());
 
-        QColor color(palette.color(QPalette::Highlight));
-        _helper->renderProgressBarBusyContents(painter, rect, color, _dark ? _helper->darken(color, 0.3) : _helper->darken(color, 0.15), horizontal, reverse, progress);
+        _helper->renderProgressBarBusyContents(painter, rect, palette.color(QPalette::Highlight), palette.color(QPalette::Highlight), horizontal, reverse, progress, true);
     } else {
         QRegion oldClipRegion(painter->clipRegion());
         if (horizontal) {
@@ -5031,7 +5030,7 @@ bool Style::drawProgressBarContentsControl(const QStyleOption *option, QPainter 
             }
         }
 
-        _helper->renderProgressBarContents(painter, rect, palette.color(QPalette::Highlight), _dark ? _helper->darken(palette.color(QPalette::Highlight), 0.3) : _helper->darken(palette.color(QPalette::Highlight), 0.15));
+        _helper->renderProgressBarContents(painter, rect, palette.color(QPalette::Highlight), palette.color(QPalette::Highlight));
         painter->setClipRegion(oldClipRegion);
     }
 
@@ -5042,8 +5041,8 @@ bool Style::drawProgressBarContentsControl(const QStyleOption *option, QPainter 
 bool Style::drawProgressBarGrooveControl(const QStyleOption *option, QPainter *painter, const QWidget *) const
 {
     const QPalette &palette(option->palette);
-    QColor outline(_helper->buttonOutlineColor(palette, false, false, AnimationData::OpacityInvalid, AnimationNone, _dark));
-    QColor color(palette.currentColorGroup() ? palette.color(QPalette::Window) : _helper->mix(outline, palette.color(QPalette::Window)));
+    QColor outline(_helper->borderGeneric());
+    QColor color(_helper->darkeningBG());
     _helper->renderProgressBarGroove(painter, option->rect, color, outline);
     return true;
 }
@@ -6352,10 +6351,10 @@ bool Style::drawSliderComplexControl(const QStyleOptionComplex *option, QPainter
         QRect grooveRect(subControlRect(CC_Slider, sliderOption, SC_SliderGroove, widget));
 
         // base color
-        QColor outline(_helper->buttonOutlineColor(palette, false, false, AnimationData::OpacityInvalid, AnimationNone, _dark));
-        QColor grooveColor(palette.currentColorGroup() ? palette.color(QPalette::Window) : _helper->mix(outline, palette.color(QPalette::Window)));
+        QColor outline(_helper->borderGeneric());
+        QColor grooveColor(_helper->darkeningBG());
         QColor highlightColor(palette.color(QPalette::Highlight));
-        QColor highlightOutline(_dark ? _helper->darken(highlightColor, 0.3) : _helper->darken(highlightColor, 0.15));
+        QColor highlightOutline(highlightColor);
 
         if (!enabled)
             _helper->renderProgressBarGroove(painter, grooveRect, grooveColor, outline);
@@ -6412,7 +6411,12 @@ bool Style::drawSliderComplexControl(const QStyleOptionComplex *option, QPainter
 
         // define colors
         QColor background(_helper->indicatorBackgroundColor(palette, mouseOver, false, false, opacity, AnimationNone, CheckOff, _dark, true));
-        QColor outline(_helper->indicatorOutlineColor(palette, handleActive && mouseOver, hasFocus, opacity, mode, CheckOff, _dark, true));
+        QColor outline = QColor();
+        if (sunken) {
+            outline = option->palette.color(QPalette::Highlight);
+        } else {
+            outline = _helper->buttonOutlineColor(palette, false, hasFocus, opacity, mode, _dark);
+        }
         QColor shadow(_helper->shadowColor(palette));
 
         // render
@@ -6456,7 +6460,7 @@ bool Style::drawDialComplexControl(const QStyleOptionComplex *option, QPainter *
         QRect grooveRect(subControlRect(CC_Dial, sliderOption, SC_SliderGroove, widget));
 
         // groove
-        QColor grooveColor(Helper::mix(palette.color(QPalette::Window), palette.color(QPalette::WindowText), 0.3));
+        QColor grooveColor(_helper->borderGeneric());
 
         // render groove
         _helper->renderDialGroove(painter, grooveRect, grooveColor);
@@ -6493,7 +6497,12 @@ bool Style::drawDialComplexControl(const QStyleOptionComplex *option, QPainter *
 
         // define colors
         QColor background(palette.color(QPalette::Button));
-        QColor outline(_helper->sliderOutlineColor(palette, handleActive && mouseOver, hasFocus, opacity, mode));
+        QColor outline = QColor();
+        if (sunken) {
+            outline = option->palette.color(QPalette::Highlight);
+        } else {
+            outline = _helper->buttonOutlineColor(palette, false, hasFocus, opacity, mode, _dark);
+        }
         QColor shadow(_helper->shadowColor(palette));
 
         // render

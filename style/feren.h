@@ -89,7 +89,7 @@ namespace Feren
         const int ProgressBarBusyStepDuration { 600 };
         const int ScrollBarAddLineButtons { 0 };
         const int ScrollBarSubLineButtons { 0 };
-        const bool ScrollBarShowOnMouseOver { true };
+        const bool ScrollBarShowOnMouseOver { false };
         const int MnemonicsMode { MN_AUTO };
         const bool ToolBarDrawItemSeparator { 0 };
         const bool ViewDrawFocusIndicator { true };
@@ -215,7 +215,7 @@ namespace Feren
         Slider_TickLength = 4,
         Slider_TickMarginWidth = 6,
         Slider_GrooveThickness = 3,
-        Slider_ControlThickness = 24,
+        Slider_ControlThickness = 26,
 
         // tabbar
         TabBar_TabMarginHeight = 9,
