@@ -279,7 +279,7 @@ QColor Helper::checkBoxIndicatorColor(const QPalette &palette, bool mouseOver, b
         if (active) {
             return palette.color(QPalette::HighlightedText);
         } else {
-            return transparentize(palette.color(QPalette::ToolTipText), 0.2);
+            return transparentize(palette.color(QPalette::Text), 0.2);
         }
     }
 }
@@ -589,7 +589,7 @@ void Helper::renderButtonFrame(QPainter *painter, const QRect &rect, const QColo
         painter->setPen(Qt::NoPen);
 
     // content
-    if (color.isValid() && active) {
+    if (color.isValid()) {
         QLinearGradient gradient(frameRect.bottomLeft(), frameRect.topLeft());
         if (sunken) {
             // Pressed button in normal and dark mode is not a gradient, just an image consting from same $color
@@ -612,6 +612,12 @@ void Helper::renderButtonFrame(QPainter *painter, const QRect &rect, const QColo
     } else {
         painter->setBrush(Qt::NoBrush);
     }
+    
+    if (sunken) {
+        // TODO: false is for _dark
+        QColor outline2(indicatorOutlineColor(palette, mouseOver, false, AnimationData::OpacityInvalid, AnimationNone, CheckOn, false));
+        painter->setPen(outline2.darker(130));
+    }
 
     // render
     painter->drawRoundedRect(frameRect, radius, radius);
@@ -619,11 +625,6 @@ void Helper::renderButtonFrame(QPainter *painter, const QRect &rect, const QColo
     if (!sunken && mouseOver) {
         //Illusion Sign "Button Shadow"
         painter->setPen(outline.darker(114));
-        painter->drawLine(frameRect.bottomLeft() + QPointF(2.7, 0), frameRect.bottomRight() + QPointF(-2.7, 0));
-    } else if (sunken) {
-        // TODO: false is for _dark
-        QColor outline2(indicatorOutlineColor(palette, mouseOver, false, AnimationData::OpacityInvalid, AnimationNone, CheckOn, false));
-        painter->setPen(outline2.darker(130));
         painter->drawLine(frameRect.bottomLeft() + QPointF(2.7, 0), frameRect.bottomRight() + QPointF(-2.7, 0));
     }
 }
@@ -1278,7 +1279,8 @@ void Helper::renderTabBarTab(QPainter *painter, const QRect &rect, const QColor 
 
     // pen
     if (outline.isValid()) {
-        painter->setPen(outline);
+        //painter->setPen(outline);
+        painter->setPen(Qt::NoPen);
         frameRect.adjust(1.0, 1.0, -1.0, -1.0);
         adjustment = 0;
 
@@ -1291,11 +1293,11 @@ void Helper::renderTabBarTab(QPainter *painter, const QRect &rect, const QColor 
         // render
         painter->drawRect(frameRect);
     } else if (!renderFrame) {
-        adjustment = 7;
+        adjustment = 9;
     }
 
     //FIXME: Why is this different heights when it's the SAME line no matter the state (and colour)?
-    painter->setPen(QPen(color, 4));
+    painter->setPen(QPen(color, 7));
 
     switch (corners) {
     case CornersTop:

@@ -814,16 +814,8 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
         return pushButtonFocusRect(option, widget);
     case SE_CheckBoxContents:
         return checkBoxContentsRect(option, widget);
-    case SE_CheckBoxIndicator:
-        return checkBoxIndicatorRect(option, widget);
-    case SE_CheckBoxFocusRect:
-        return checkBoxFocusRect(option, widget);
     case SE_RadioButtonContents:
         return checkBoxContentsRect(option, widget);
-    case SE_RadioButtonIndicator:
-        return checkBoxIndicatorRect(option, widget);
-    case SE_RadioButtonFocusRect:
-        return checkBoxFocusRect(option, widget);
     case SE_LineEditContents:
         return lineEditContentsRect(option, widget);
     case SE_ProgressBarGroove:
@@ -1699,20 +1691,6 @@ QRect Style::checkBoxContentsRect(const QStyleOption *option, const QWidget *) c
 }
 
 //___________________________________________________________________________________________________________________
-QRect Style::checkBoxIndicatorRect(const QStyleOption *option, const QWidget *widget) const
-{
-    return ParentStyleClass::subElementRect(SE_CheckBoxIndicator, option, widget).translated(Metrics::CheckBox_ItemSpacing, 0);
-}
-
-//___________________________________________________________________________________________________________________
-QRect Style::checkBoxFocusRect(const QStyleOption *option, const QWidget *widget) const
-{
-    return QRect(option->rect.left() + 2, option->rect.top() + 1,
-                 ParentStyleClass::subElementRect(SE_CheckBoxFocusRect, option, widget).right() - option->rect.left(),
-                 option->rect.height() - 2);
-}
-
-//___________________________________________________________________________________________________________________
 QRect Style::lineEditContentsRect(const QStyleOption *option, const QWidget *widget) const
 {
     // cast option and check
@@ -2229,54 +2207,114 @@ QRect Style::genericLayoutItemRect(const QStyleOption *option, const QWidget *wi
     return insideMargin(option->rect, -Metrics::Frame_FrameWidth);
 }
 
+
 //______________________________________________________________
-QRect Style::groupBoxSubControlRect(const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
+QRect Style::groupBoxSubControlRect( const QStyleOptionComplex* option, SubControl subControl, const QWidget* widget ) const
 {
-    if (const QStyleOptionGroupBox *groupBox = qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
-        QRect rect = ParentStyleClass::subControlRect(CC_GroupBox, option, subControl, widget);
-        int topMargin = 0;
-        int topHeight = 0;
-        int verticalAlignment = proxy()->styleHint(SH_GroupBox_TextLabelVerticalAlignment, groupBox, widget);
 
-        if (!groupBox->text.isEmpty()) {
-            topHeight = groupBox->fontMetrics.height();
-            if (verticalAlignment & Qt::AlignVCenter) {
-                topMargin = topHeight / 2;
-            } else if (verticalAlignment & Qt::AlignTop) {
-                topMargin = topHeight;
-            }
-        }
-        QRect frameRect = groupBox->rect;
-        frameRect.setTop(topMargin);
-        if (subControl == SC_GroupBoxFrame) {
+    QRect rect = option->rect;
+    switch( subControl )
+    {
+
+        case SC_GroupBoxFrame: return rect;
+
+        case SC_GroupBoxContents:
+        {
+
+            // cast option and check
+            const auto groupBoxOption = qstyleoption_cast<const QStyleOptionGroupBox*>( option );
+            if( !groupBoxOption ) break;
+
+            // take out frame width
+            rect = insideMargin( rect, Metrics::Frame_FrameWidth );
+
+            // get state
+            const bool checkable( groupBoxOption->subControls & QStyle::SC_GroupBoxCheckBox );
+            const bool emptyText( groupBoxOption->text.isEmpty() );
+
+            // calculate title height
+            int titleHeight( 0 );
+            if( !emptyText ) titleHeight = groupBoxOption->fontMetrics.height();
+            if( checkable ) titleHeight = qMax( titleHeight, int(Metrics::CheckBox_Size) );
+
+            // add margin
+            if( titleHeight > 0 ) titleHeight += 2*Metrics::GroupBox_TitleMarginWidth;
+
+            rect.adjust( 0, titleHeight, 0, 0 );
             return rect;
-        } else if (subControl == SC_GroupBoxContents) {
-            int margin = 0;
-            int leftMarginExtension = 16;
-            return frameRect.adjusted(leftMarginExtension + margin, margin + topHeight, -margin, -margin);
+
         }
 
-        if (const QGroupBox *groupBoxWidget = qobject_cast<const QGroupBox *>(widget)) {
-            //Prepare metrics for a bold font
-            QFont font = widget->font();
-            font.setBold(true);
-            QFontMetrics fontMetrics(font);
+        case SC_GroupBoxCheckBox:
+        case SC_GroupBoxLabel:
+        {
 
-            QSize textRect = fontMetrics.boundingRect(groupBoxWidget->title()).size() + QSize(2, 2);
-            if (subControl == SC_GroupBoxCheckBox) {
-                int indicatorWidth = proxy()->pixelMetric(PM_IndicatorWidth, option, widget);
-                int indicatorHeight = proxy()->pixelMetric(PM_IndicatorHeight, option, widget);
-                rect.setWidth(indicatorWidth);
-                rect.setHeight(indicatorHeight);
-                rect.moveTop((textRect.height() - indicatorHeight) / 2);
-            } else if (subControl == SC_GroupBoxLabel) {
-                rect.setSize(textRect);
+            // cast option and check
+            const auto groupBoxOption = qstyleoption_cast<const QStyleOptionGroupBox*>( option );
+            if( !groupBoxOption ) break;
+
+            // take out frame width
+            rect = insideMargin( rect, Metrics::Frame_FrameWidth );
+
+            const bool emptyText( groupBoxOption->text.isEmpty() );
+            const bool checkable( groupBoxOption->subControls & QStyle::SC_GroupBoxCheckBox );
+
+            // calculate title height
+            int titleHeight( 0 );
+            int titleWidth( 0 );
+            if( !emptyText )
+            {
+                const QFontMetrics fontMetrics = option->fontMetrics;
+                titleHeight = qMax( titleHeight, fontMetrics.height() );
+                titleWidth += fontMetrics.size( _mnemonics->textFlags(), groupBoxOption->text ).width();
             }
+
+            if( checkable )
+            {
+                titleHeight = qMax( titleHeight, int(Metrics::CheckBox_Size) );
+                titleWidth += Metrics::CheckBox_Size;
+                if( !emptyText ) titleWidth += Metrics::CheckBox_ItemSpacing;
+            }
+
+            // adjust height
+            auto titleRect( rect );
+            titleRect.setHeight( titleHeight );
+            titleRect.translate( 0, Metrics::GroupBox_TitleMarginWidth );
+
+            // center
+            titleRect = centerRect( titleRect, titleWidth, titleHeight );
+
+            if( subControl == SC_GroupBoxCheckBox )
+            {
+
+                // vertical centering
+                titleRect = centerRect( titleRect, titleWidth, Metrics::CheckBox_Size );
+
+                // horizontal positioning
+                const QRect subRect( titleRect.topLeft(), QSize( Metrics::CheckBox_Size, titleRect.height() ) );
+                return visualRect( option->direction, titleRect, subRect );
+
+            } else {
+
+                // vertical centering
+                QFontMetrics fontMetrics = option->fontMetrics;
+                titleRect = centerRect( titleRect, titleWidth, fontMetrics.height() );
+
+                // horizontal positioning
+                auto subRect( titleRect );
+                if( checkable ) subRect.adjust( Metrics::CheckBox_Size + Metrics::CheckBox_ItemSpacing, 0, 0, 0 );
+                return visualRect( option->direction, titleRect, subRect );
+
+            }
+
         }
-        return rect;
+
+        default: break;
+
     }
 
-    return ParentStyleClass::subControlRect(CC_GroupBox, option, subControl, widget);
+    return ParentStyleClass::subControlRect( CC_GroupBox, option, subControl, widget );
+
 }
 
 //___________________________________________________________________________________________________________________
@@ -3486,12 +3524,12 @@ bool Style::drawIndicatorArrowPrimitive(ArrowOrientation orientation, const QSty
             bool animated(_animations->toolButtonEngine().isAnimated(widget, AnimationHover));
             qreal opacity(_animations->toolButtonEngine().opacity(widget, AnimationHover));
 
-            if (sunken || (selected && active))
+            if ((sunken || selected) && active)
                 color = palette.color(QPalette::HighlightedText);
             else
                 color = _helper->arrowColor(palette, arrowHover, false, opacity, animated ? AnimationHover : AnimationNone);
         } else {
-            if (sunken || (selected && active)) {
+            if ((sunken || selected) && active) {
                 color = palette.color(QPalette::HighlightedText);
             } else {
                 color = _helper->arrowColor(palette, QPalette::ButtonText);
@@ -4251,9 +4289,9 @@ bool Style::drawPushButtonLabelControl(const QStyleOption *option, QPainter *pai
 
     // color role
     QPalette::ColorRole textRole;
-    if (hasFocus && !sunken && !(selected && active)) {
+    if (hasFocus && !(sunken && selected) && !active) {
         textRole = QPalette::ButtonText;
-    } else if (sunken || (selected && active)) {
+    } else if ((sunken || selected) && active) {
         textRole = QPalette::HighlightedText;
     } else {
         textRole = QPalette::ButtonText;
@@ -4320,7 +4358,7 @@ bool Style::drawPushButtonLabelControl(const QStyleOption *option, QPainter *pai
         const QIcon::State iconState( sunken ? QIcon::On : QIcon::Off );
         QIcon::Mode iconMode;
         if( !enabled ) iconMode = QIcon::Disabled;
-        else if(sunken || (selected && active)) iconMode = QIcon::Selected;
+        else if((sunken || selected) && active) iconMode = QIcon::Selected;
         else iconMode = QIcon::Normal;
 
         const auto pixmap = _helper->coloredIcon(buttonOption->icon, buttonOption->palette, iconSize, iconMode, iconState);
@@ -4436,7 +4474,7 @@ bool Style::drawToolButtonLabelControl(const QStyleOption *option, QPainter *pai
         const QIcon::State iconState(sunken ? QIcon::On : QIcon::Off);
         QIcon::Mode iconMode;
         if( !enabled ) iconMode = QIcon::Disabled;
-        else if(sunken || (selected && active)) iconMode = QIcon::Selected;
+        else if((sunken || selected) && active) iconMode = QIcon::Selected;
         else iconMode = QIcon::Normal;
 
         const QPixmap pixmap = _helper->coloredIcon(toolButtonOption->icon, toolButtonOption->palette, iconSize, iconMode, iconState);

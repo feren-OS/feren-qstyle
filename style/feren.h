@@ -181,7 +181,7 @@ namespace Feren
         // checkboxes and radio buttons
         CheckBox_Size = 21,
         CheckBox_FocusMarginWidth = 3,
-        CheckBox_ItemSpacing = 10,
+        CheckBox_ItemSpacing = 4,
 
         // menubar items
         MenuBarItem_MarginWidth = 8,
