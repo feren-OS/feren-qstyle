@@ -89,7 +89,7 @@ namespace Feren
         const int ProgressBarBusyStepDuration { 600 };
         const int ScrollBarAddLineButtons { 0 };
         const int ScrollBarSubLineButtons { 0 };
-        const bool ScrollBarShowOnMouseOver { false };
+        const bool ScrollBarShowOnMouseOver { true };
         const int MnemonicsMode { MN_AUTO };
         const bool ToolBarDrawItemSeparator { 0 };
         const bool ViewDrawFocusIndicator { true };

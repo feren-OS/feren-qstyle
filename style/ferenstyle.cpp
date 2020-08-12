@@ -250,11 +250,6 @@ Style::Style(bool dark)
             QStringLiteral( "org.kde.Breeze.Style" ),
             QStringLiteral( "reparseConfiguration" ), this, SLOT(configurationChanged()));
 
-    dbus.connect(QString(),
-            QStringLiteral( "/BreezeStyle" ),
-            QStringLiteral( "org.kde.Breeze.Style" ),
-            QStringLiteral( "reparseConfiguration" ), this, SLOT(configurationChanged()));
-
     // Detect if running under KDE, if so set menus, etc, to have translucent background.
     // For GNOME desktop, dont want translucent backgrounds otherwise no menu shadow is drawn.
     _isKDE = qgetenv("XDG_CURRENT_DESKTOP").toLower() == "kde";
@@ -3777,7 +3772,7 @@ bool Style::drawPanelTipLabelPrimitive(const QStyleOption *option, QPainter *pai
 {
     const QPalette &palette(option->palette);
     QColor background(palette.color(QPalette::ToolTipBase));
-    QColor outline(Helper::transparentize(QColor("black"), 0.3));
+    QColor outline(palette.color(QPalette::ToolTipBase));
 
     _helper->renderTooltipFrame(painter, option->rect, background, outline);
     return true;

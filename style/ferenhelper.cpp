@@ -552,7 +552,7 @@ void Helper::renderMenuFrame(QPainter *painter, const QRect &rect, const QColor 
     QRectF frameRect(rect);
     if (outline.isValid()) {
         painter->setPen(outline);
-        frameRect.adjust(0.5, 0.5, -0.5, -0.5);
+        frameRect.adjust(0, 0, -1, -1);
     } else
         painter->setPen(Qt::NoPen);
 
@@ -562,21 +562,33 @@ void Helper::renderMenuFrame(QPainter *painter, const QRect &rect, const QColor 
 //______________________________________________________________________________
 void Helper::renderTooltipFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, bool roundCorners) const
 {
-    // set brush
-    if (color.isValid()) 
-        painter->setBrush(color);
-    else
-        painter->setBrush(Qt::NoBrush);
 
     painter->setRenderHint(QPainter::Antialiasing, false);
     QRectF frameRect(rect);
+    
+    // set brush
+    if (color.isValid()) {
+        QLinearGradient gradient(frameRect.bottomLeft(), frameRect.topLeft());
+        gradient.setColorAt(0, darken(color, 0.05));
+        gradient.setColorAt(1, color);
+        painter->setBrush(gradient);
+    } else
+        painter->setBrush(Qt::NoBrush);
+    
     if (outline.isValid()) {
         painter->setPen(outline);
         frameRect.adjust(0.5, 0.5, -0.5, -0.5);
     } else
         painter->setPen(Qt::NoPen);
 
-    painter->drawRect(frameRect);
+    painter->drawRoundedRect( frameRect, 3, 3 );
+    
+    //Darkening border 'cos consistency
+    if (outline.isValid()) {
+        painter->setBrush(Qt::NoBrush);
+        painter->setPen(borderGeneric());
+        painter->drawRoundedRect( frameRect, 3, 3 );
+    }
 }
 
 //______________________________________________________________________________
