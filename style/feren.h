@@ -204,7 +204,7 @@ namespace Feren
         ToolBar_ItemSpacing = 0,
 
         // progressbars
-        ProgressBar_BusyIndicatorSize = 24,
+        ProgressBar_BusyIndicatorSize = 80,
         ProgressBar_Thickness = 3,
         ProgressBar_ItemSpacing = 3,
 
