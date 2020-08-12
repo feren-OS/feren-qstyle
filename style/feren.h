@@ -158,7 +158,7 @@ namespace Feren
         // spinbox
         SpinBox_FrameWidth = LineEdit_FrameWidth,
         SpinBox_ArrowButtonWidth = 20,
-        SpinBox_MinHeight = 36,
+        SpinBox_MinHeight = 24,
         SpinBox_MinWidth = 80,
         SpinBox_MarginHeight = 4,
         SpinBox_MarginWidth = 8,

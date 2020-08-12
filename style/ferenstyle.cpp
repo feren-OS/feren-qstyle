@@ -6752,31 +6752,14 @@ void Style::renderSpinBoxArrow(const SubControl &subControl, const QStyleOptionS
     // arrow rect
     QRect arrowRect(subControlRect(CC_SpinBox, option, subControl, widget));
 
-    if (subControl == SC_SpinBoxDown) {
-        painter->setBrush(Qt::NoBrush);
-        painter->setPen(outline);
-        int highlight = hasFocus ? 1 : 0;
-        painter->drawLine(arrowRect.left(), arrowRect.top() + 2 + highlight, arrowRect.left(), arrowRect.bottom() - 1 - highlight);
-    }
-    if (subControl == SC_SpinBoxUp) {
-        painter->setBrush(Qt::NoBrush);
-        painter->setPen(outline);
-        int highlight = hasFocus ? 1 : 0;
-        painter->drawLine(arrowRect.left(), arrowRect.top() + 2 + highlight, arrowRect.left(), arrowRect.bottom() - 1 - highlight);
-    }
-
     if (true) {
         painter->setPen(Qt::NoPen);
-        QColor background = Helper::mix(palette.base().color(), palette.text().color(), opacity * 0.1);
-        background = Helper::mix(background, palette.dark().color(), pressedOpacity);
+        QColor background = _helper->alphaColor(palette.text().color(), (opacity * 0.046) + (pressedOpacity * 0.052));
         painter->setBrush(background);
-        if (hasFocus)
-            painter->drawRect(arrowRect.adjusted(1, 3, -1, -2));
-        else
-            painter->drawRect(arrowRect.adjusted(1, 2, -1, -1));
+        painter->drawRect(arrowRect.adjusted(1, 3, -1, -2));
     }
 
-    // render
+    // render 
     _helper->renderSign(painter, arrowRect, color, orientation == ArrowUp);
 
     return;
