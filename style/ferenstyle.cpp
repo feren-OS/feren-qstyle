@@ -245,10 +245,15 @@ Style::Style(bool dark)
 {
     // use DBus connection to update on feren configuration change
     QDBusConnection dbus = QDBusConnection::sessionBus();
-    dbus.connect(QString(),
+    dbus.connect( QString(),
             QStringLiteral( "/BreezeStyle" ),
             QStringLiteral( "org.kde.Breeze.Style" ),
-            QStringLiteral( "reparseConfiguration" ), this, SLOT(configurationChanged()));
+            QStringLiteral( "reparseConfiguration" ), this, SLOT(configurationChanged()) );
+
+    dbus.connect( QString(),
+            QStringLiteral( "/KGlobalSettings" ),
+            QStringLiteral( "org.kde.KGlobalSettings" ),
+            QStringLiteral( "notifyChange" ), this, SLOT(configurationChanged()) );
 
     // Detect if running under KDE, if so set menus, etc, to have translucent background.
     // For GNOME desktop, dont want translucent backgrounds otherwise no menu shadow is drawn.
@@ -1412,9 +1417,9 @@ bool Style::eventFilterComboBoxContainer(QWidget *widget, QEvent *event)
         bool hasAlpha(_helper->hasAlphaChannel(widget));
         if (hasAlpha) {
             painter.setCompositionMode(QPainter::CompositionMode_Source);
-            _helper->renderMenuFrame(&painter, rect, background, outline, true);
+            _helper->renderMenuFrame(&painter, rect, background, outline, palette);
         } else {
-            _helper->renderMenuFrame(&painter, rect, background, outline, false);
+            _helper->renderMenuFrame(&painter, rect, background, outline, palette);
         }
     }
 
@@ -1440,7 +1445,7 @@ bool Style::eventFilterDockWidget(QDockWidget *dockWidget, QEvent *event)
 
         // render
         if (dockWidget->isFloating()) {
-            _helper->renderMenuFrame(&painter, rect, background, outline, false);
+            _helper->renderMenuFrame(&painter, rect, background, outline, palette);
         } else if (Feren::Config::DockWidgetDrawFrame || (dockWidget->features() & QDockWidget::AllDockWidgetFeatures)) {
             _helper->renderFrame(&painter, rect, background, outline);
         }
@@ -1452,6 +1457,7 @@ bool Style::eventFilterDockWidget(QDockWidget *dockWidget, QEvent *event)
 //____________________________________________________________________________
 bool Style::eventFilterMdiSubWindow(QMdiSubWindow *subWindow, QEvent *event)
 {
+    const QPalette &palette(subWindow->palette());
     if (event->type() == QEvent::Paint) {
         QPainter painter(subWindow);
         QPaintEvent *paintEvent(static_cast<QPaintEvent *>(event));
@@ -1467,7 +1473,7 @@ bool Style::eventFilterMdiSubWindow(QMdiSubWindow *subWindow, QEvent *event)
             painter.drawRect(rect);
         } else {
             // framed painting
-            _helper->renderMenuFrame(&painter, rect, background, QColor());
+            _helper->renderMenuFrame(&painter, rect, background, QColor(), palette);
         }
     }
 
@@ -3327,14 +3333,14 @@ bool Style::drawFrameMenuPrimitive(const QStyleOption *option, QPainter *painter
         QColor outline(_helper->menuOutlineColor(palette));
 
         bool hasAlpha(_helper->hasAlphaChannel(widget));
-        _helper->renderMenuFrame(painter, option->rect, background, outline, hasAlpha);
+        _helper->renderMenuFrame(painter, option->rect, background, outline, palette);
     } else if (isQtQuickControl(option, widget)) {
         const QPalette &palette(option->palette);
         QColor background(_helper->menuBackgroundColor(palette));
         QColor outline(_helper->menuOutlineColor(palette));
 
         bool hasAlpha(_helper->hasAlphaChannel(widget));
-        _helper->renderMenuFrame(painter, option->rect, background, outline, hasAlpha);
+        _helper->renderMenuFrame(painter, option->rect, background, outline, palette);
     }
 
     return true;
@@ -3465,7 +3471,7 @@ bool Style::drawFrameWindowPrimitive(const QStyleOption *option, QPainter *paint
 
     // render frame outline
     QColor outline(_helper->frameOutlineColor(palette, false, selected));
-    _helper->renderMenuFrame(painter, rect, QColor(), outline);
+    _helper->renderMenuFrame(painter, rect, QColor(), outline, palette);
 
     return true;
 
@@ -3762,7 +3768,7 @@ bool Style::drawPanelMenuPrimitive(const QStyleOption *option, QPainter *painter
     QColor outline(_helper->menuOutlineColor(palette));
 
     bool hasAlpha(_helper->hasAlphaChannel(widget));
-    _helper->renderMenuFrame(painter, option->rect, background, outline, hasAlpha);
+    _helper->renderMenuFrame(painter, option->rect, background, outline, palette);
 
     return true;
 }

@@ -540,7 +540,7 @@ void Helper::renderSidePanelFrame(QPainter *painter, const QRect &rect, const QC
 }
 
 //______________________________________________________________________________
-void Helper::renderMenuFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, bool roundCorners) const
+void Helper::renderMenuFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, const QPalette &palette) const
 {
     // set brush
     if (color.isValid()) 
@@ -551,11 +551,15 @@ void Helper::renderMenuFrame(QPainter *painter, const QRect &rect, const QColor 
     painter->setRenderHint(QPainter::Antialiasing, false);
     QRectF frameRect(rect);
     if (outline.isValid()) {
-        painter->setPen(outline);
+        painter->setPen(palette.color(QPalette::Base));
         frameRect.adjust(0.5, 0.5, -0.5, -0.5);
     } else
         painter->setPen(Qt::NoPen);
 
+    painter->drawRect(frameRect);
+    
+    painter->setBrush(Qt::NoBrush);
+    painter->setPen(borderGeneric());
     painter->drawRect(frameRect);
 }
 

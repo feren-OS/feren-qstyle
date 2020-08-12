@@ -303,7 +303,7 @@ public:
     void renderSidePanelFrame(QPainter *painter, const QRect &rect, const QColor &outline, Side) const;
 
     //* menu frame
-    void renderMenuFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, bool roundCorners = true) const;
+    void renderMenuFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, const QPalette &palette) const;
 
     //* tooltip frame
     void renderTooltipFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, bool roundCorners = true) const;
