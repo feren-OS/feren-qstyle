@@ -58,7 +58,9 @@ Helper::Helper(const QByteArray &name)
 //____________________________________________________________________
 void Helper::loadConfig()
 {
-    const QPalette palette( QApplication::palette() );
+    QPalette paletteold( QApplication::palette() );
+    paletteold.setColor(QPalette::All,      QPalette::Shadow,          borderGeneric());
+    const QPalette palette( paletteold );
 }
 
 //____________________________________________________________________
@@ -90,7 +92,11 @@ QColor Helper::indicatorOutlineColor(const QPalette &palette, bool mouseOver, bo
 QColor Helper::frameOutlineColor(const QPalette &palette, bool mouseOver, bool hasFocus, qreal opacity, AnimationMode mode, bool darkMode) const
 {
     QColor col( 0,0,0 );
-    return alphaColor(col, 0.19);
+    if (hasFocus) {
+        return focusColor(palette);
+    } else {
+        return alphaColor(col, 0.19);
+    }
 }
 
 QColor Helper::inputOutlineColor(const QPalette &palette, bool mouseOver, bool hasFocus, qreal opacity, AnimationMode mode, bool darkMode) const
