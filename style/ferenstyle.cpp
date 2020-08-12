@@ -4714,8 +4714,8 @@ bool Style::drawMenuBarItemControl(const QStyleOption *option, QPainter *painter
     bool useStrongFocus(Feren::Config::MenuItemDrawStrongFocus);
 
     painter->save();
-//     painter->setRenderHint(QPainter::Antialiasing, false);
-// 
+    painter->setRenderHint(QPainter::Antialiasing, false);
+
 //     painter->setBrush(palette.window().color());
 //     painter->setPen(Qt::NoPen);
 //     painter->drawRect(rect);

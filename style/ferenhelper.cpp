@@ -95,7 +95,7 @@ QColor Helper::frameOutlineColor(const QPalette &palette, bool mouseOver, bool h
     if (hasFocus) {
         return focusColor(palette);
     } else {
-        return alphaColor(col, 0.19);
+        return darken(palette.color(QPalette::Window), 0.19);
     }
 }
 
@@ -368,7 +368,12 @@ void Helper::renderFocusRect(QPainter *painter, const QRect &rect, const QColor 
 
     painter->save();
     painter->setRenderHints(QPainter::Antialiasing);
-    painter->setBrush(color);
+    
+    QLinearGradient gradient(rect.bottomLeft(), rect.topLeft());
+    gradient.setColorAt(0, darken(color, 0.014));
+    gradient.setColorAt(1, color);
+    painter->setBrush(gradient);
+    
 
     if (!(outline.isValid() && sides)) {
         painter->setPen(Qt::NoPen);
