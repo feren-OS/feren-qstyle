@@ -2434,6 +2434,7 @@ QRect Style::spinBoxSubControlRect(const QStyleOptionComplex *option, SubControl
     if (!spinBoxOption)
         return ParentStyleClass::subControlRect(CC_SpinBox, option, subControl, widget);
     bool flat(!spinBoxOption->frame);
+    bool reverseLayout(option->direction == Qt::RightToLeft);
 
     // copy rect
     QRect rect(option->rect);
@@ -2443,28 +2444,58 @@ QRect Style::spinBoxSubControlRect(const QStyleOptionComplex *option, SubControl
         return flat ? QRect() : rect;
 
     case SC_SpinBoxUp:
-        if (rect.width() > 2 * rect.height() + 24)
-            return QRect(rect.right() - rect.height() - 1,
-                         rect.top(),
-                         rect.height(),
-                         rect.height() - 1);
-        else
-            return QRect(rect.right() - 0.6 * rect.height(),
-                         rect.top(),
-                         rect.height() * 0.6,
-                         rect.height() / 2 + 3);
+        if (rect.width() > 2 * rect.height() + 24) {
+            if (reverseLayout) {
+                return QRect(rect.left() + 1,
+                            rect.top(),
+                            rect.height(),
+                            rect.height() - 1);
+            } else {
+                return QRect(rect.right() - rect.height() - 1,
+                            rect.top(),
+                            rect.height(),
+                            rect.height() - 1);
+            }
+        } else {
+            if (reverseLayout) {
+                return QRect(rect.left(),
+                            rect.top(),
+                            rect.height() * 0.6,
+                            rect.height() / 2 + 3);
+            } else {
+                return QRect(rect.right() - 0.6 * rect.height(),
+                            rect.top(),
+                            rect.height() * 0.6,
+                            rect.height() / 2 + 3);
+            }
+        }
 
     case SC_SpinBoxDown: {
-        if (rect.width() > 2 * rect.height() + 24)
-            return QRect(rect.right() - 2 * rect.height(),
-                         rect.top(),
-                         rect.height(),
-                         rect.height() - 1);
-        else
-            return QRect(rect.right() - 0.6 * rect.height(),
-                         rect.top() + rect.height() / 2 - 2,
-                         rect.height() * 0.6,
-                         rect.height() / 2 + 1);
+        if (rect.width() > 2 * rect.height() + 24) {
+            if (reverseLayout) {
+                return QRect(rect.left() + rect.height(),
+                            rect.top(),
+                            rect.height(),
+                            rect.height() - 1);
+            } else {
+                return QRect(rect.right() - 2 * rect.height(),
+                            rect.top(),
+                            rect.height(),
+                            rect.height() - 1);
+            }
+        } else {
+            if (reverseLayout) {
+                return QRect(rect.left(),
+                            rect.top() + rect.height() / 2 - 2,
+                            rect.height() * 0.6,
+                            rect.height() / 2 + 1);
+            } else {
+                return QRect(rect.right() - 0.6 * rect.height(),
+                            rect.top() + rect.height() / 2 - 2,
+                            rect.height() * 0.6,
+                            rect.height() / 2 + 1);
+            }
+        }
     }
 
     case SC_SpinBoxEditField: {
@@ -6234,36 +6265,41 @@ bool Style::drawComboBoxComplexControl(const QStyleOptionComplex *option, QPaint
 //______________________________________________________________
 bool Style::drawSpinBoxComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
-    const QStyleOptionSpinBox *spinBoxOption(qstyleoption_cast<const QStyleOptionSpinBox *>(option));
-    if (!spinBoxOption)
-        return true;
+    const auto spinBoxOption( qstyleoption_cast<const QStyleOptionSpinBox*>( option ) );
+        if( !spinBoxOption ) return true;
 
-    // store palette and rect
-    const QPalette &palette(option->palette);
-    const QRect &rect(option->rect);
+        // store palette and rect
+        const auto& palette( option->palette );
+        const auto& rect( option->rect );
 
-    if (option->subControls & SC_SpinBoxFrame) {
-        // detect flat spinboxes
-        bool flat(!spinBoxOption->frame);
-        flat |= (rect.height() < 2 * Metrics::Frame_FrameWidth + Metrics::SpinBox_ArrowButtonWidth);
-        if (flat) {
-            QColor background(palette.color(QPalette::Base));
 
-            painter->setBrush(background);
-            painter->setPen(Qt::NoPen);
-            painter->drawRect(rect);
-        } else {
-            drawPrimitive(PE_FrameLineEdit, option, painter, widget);
+        if( option->subControls & SC_SpinBoxFrame )
+        {
+
+            // detect flat spinboxes
+            bool flat( !spinBoxOption->frame );
+            flat |= ( rect.height() < 2*Metrics::Frame_FrameWidth + Metrics::SpinBox_ArrowButtonWidth );
+            if( flat )
+            {
+
+                const auto &background = palette.color( QPalette::Base );
+
+                painter->setBrush( background );
+                painter->setPen( Qt::NoPen );
+                painter->drawRect( rect );
+
+            } else {
+
+                drawPrimitive( PE_FrameLineEdit, option, painter, widget );
+
+            }
+
         }
 
-    }
+        if( option->subControls & SC_SpinBoxUp ) renderSpinBoxArrow( SC_SpinBoxUp, spinBoxOption, painter, widget );
+        if( option->subControls & SC_SpinBoxDown ) renderSpinBoxArrow( SC_SpinBoxDown, spinBoxOption, painter, widget );
 
-    if (option->subControls & SC_SpinBoxUp)
-        renderSpinBoxArrow(SC_SpinBoxUp, spinBoxOption, painter, widget);
-    if (option->subControls & SC_SpinBoxDown)
-        renderSpinBoxArrow(SC_SpinBoxDown, spinBoxOption, painter, widget);
-
-    return true;
+        return true;
 }
 
 //______________________________________________________________
