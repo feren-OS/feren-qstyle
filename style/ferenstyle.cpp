@@ -2407,7 +2407,7 @@ QRect Style::comboBoxSubControlRect( const QStyleOptionComplex* option, SubContr
             const int frameWidth( pixelMetric( PM_ComboBoxFrameWidth, option, widget ) );
             labelRect = QRect(
                 rect.left(), rect.top(),
-                rect.width() - rect.height(),
+                rect.width() - Metrics::MenuButton_IndicatorWidth*1.5 - 4,
                 rect.height() );
 
             // remove margins

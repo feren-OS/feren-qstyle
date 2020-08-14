@@ -498,12 +498,13 @@ void Helper::renderFlatFrame(QPainter *painter, bool righttoleft, const QRect &r
 
     QPainterPath path;
     path.setFillRule(Qt::WindingFill);
+    path.addRect(frameRect.adjusted(2 * radius, 0, 0, 0));
     if (righttoleft) {
-        path.addRect(frameRect.adjusted(0, 0, 2 * radius, 0));        
+        //I gave up trying to mirror the rounding... probably made a mess out of the attempting.
+        path.addRoundedRect(frameRect.adjusted(0, 0, - 2 * radius, 0), 0, 0);        
     } else {
-        path.addRect(frameRect.adjusted(2 * radius, 0, 0, 0));
+        path.addRoundedRect(frameRect.adjusted(0, 0, - 2 * radius, 0), radius, radius);
     }
-    path.addRoundedRect(frameRect.adjusted(0, 0, - 2 * radius, 0), radius, radius);
 
     painter->drawPath(path.simplified());
 
