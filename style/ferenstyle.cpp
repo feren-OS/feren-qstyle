@@ -5160,14 +5160,7 @@ bool Style::drawScrollBarSliderControl(const QStyleOption *option, QPainter *pai
     if( horizontal ) handleRect = centerRect( rect, rect.width(), rect.height() * (0.5 + 0.5 * opacity));
     else handleRect = centerRect( rect, rect.width() * (0.5 + 0.5 * opacity), rect.height() );
     */
-    if (horizontal) {
-        handleRect = rect.adjusted(0, 6, 0, 2);
-        handleRect.adjust(0, -6.0 * opacity, 0, -2.0 * opacity);
-    } else {
-        handleRect = rect.adjusted(6, 0, 2, 0);
-        handleRect.adjust(-6.0 * opacity, 0, -2.0 * opacity, 0);
-    }
-
+    handleRect = rect.adjusted(0, 0, 0, 0);
     _helper->renderScrollBarHandle(painter, handleRect, color);
     return true;
 }
@@ -6627,8 +6620,8 @@ bool Style::drawScrollBarComplexControl(const QStyleOptionComplex *option, QPain
                     QStyleOptionFocusRect fropt;
                     fropt.QStyleOption::operator=(newScrollbar);
                     fropt.rect.setRect(newScrollbar.rect.x() + 2, newScrollbar.rect.y() + 2,
-                                       newScrollbar.rect.width() - 5,
-                                       newScrollbar.rect.height() - 5);
+                                    newScrollbar.rect.width() - 5,
+                                    newScrollbar.rect.height() - 5);
                     proxy()->drawPrimitive(PE_FrameFocusRect, &fropt, painter, widget);
                 }
             }
