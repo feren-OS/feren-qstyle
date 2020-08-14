@@ -77,7 +77,7 @@ class Style : public ParentStyleClass
 
 public:
     //* constructor
-    explicit Style(bool dark);
+    explicit Style();
 
     //* destructor
     virtual ~Style(void);
@@ -559,8 +559,6 @@ private:
 
     //! styled painting for KCapacityBar
     QStyle::ControlElement CE_CapacityBar;
-
-    bool _dark { false };
 
     bool _isGNOME { false };
     bool _isKDE { false };

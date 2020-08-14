@@ -195,13 +195,13 @@ public:
     QColor borderGeneric() const;
 
     //* indicator outline color
-    QColor indicatorOutlineColor(const QPalette &palette, bool mouseOver = false, bool hasFocus = false, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone, CheckBoxState state = CheckOff, bool darkMode = false, bool inMenu = false) const;
+    QColor indicatorOutlineColor(const QPalette &palette, bool mouseOver = false, bool hasFocus = false, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone, CheckBoxState state = CheckOff, bool inMenu = false) const;
 
     //* frame outline color, using animations
-    QColor frameOutlineColor(const QPalette &palette, bool mouseOver = false, bool hasFocus = false, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone, bool darkMode = false) const;
+    QColor frameOutlineColor(const QPalette &palette, bool mouseOver = false, bool hasFocus = false, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone) const;
 
     //* input outline color, using animations
-    QColor inputOutlineColor(const QPalette &palette, bool mouseOver = false, bool hasFocus = false, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone, bool darkMode = false) const;
+    QColor inputOutlineColor(const QPalette &palette, bool mouseOver = false, bool hasFocus = false, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone) const;
 
     //* side panel outline color, using animations
     QColor sidePanelOutlineColor(const QPalette &palette, bool hasFocus = false, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone) const;
@@ -244,13 +244,13 @@ public:
     QColor arrowColor(const QPalette &palette, bool mouseOver, bool hasFocus, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone) const;
 
     //* button outline color, using animations
-    QColor buttonOutlineColor(const QPalette &palette, bool mouseOver, bool hasFocus, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone, bool darkMode = false) const;
+    QColor buttonOutlineColor(const QPalette &palette, bool mouseOver, bool hasFocus, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone) const;
 
     //* button panel color, using animations
-    QColor buttonBackgroundColor(const QPalette &palette, bool mouseOver, bool hasFocus, bool sunken, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone, bool darkMode = false) const;
+    QColor buttonBackgroundColor(const QPalette &palette, bool mouseOver, bool hasFocus, bool sunken, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone) const;
 
     //* checkbox/radiobutton color, using animations
-    QColor indicatorBackgroundColor(const QPalette &palette, bool mouseOver, bool hasFocus, bool sunken, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone, CheckBoxState state = CheckOff, bool darkMode = false, bool inMenu = false) const;
+    QColor indicatorBackgroundColor(const QPalette &palette, bool mouseOver, bool hasFocus, bool sunken, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone, CheckBoxState state = CheckOff, bool inMenu = false) const;
 
     //* tool button color
     QColor toolButtonColor(const QPalette &palette, bool mouseOver, bool hasFocus, bool sunken, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone) const;
@@ -259,10 +259,10 @@ public:
     QColor sliderOutlineColor(const QPalette &palette, bool mouseOver, bool hasFocus, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone) const;
 
     //* scrollbar handle color, using animations
-    QColor scrollBarHandleColor(const QPalette &palette, bool mouseOver, bool hasFocus, bool sunken, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone, bool darkMode = false) const;
+    QColor scrollBarHandleColor(const QPalette &palette, bool mouseOver, bool hasFocus, bool sunken, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone) const;
 
     //* checkbox indicator, using animations
-    QColor checkBoxIndicatorColor(const QPalette &palette, bool mouseOver, bool active, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone, bool darkMode = false, bool inMenu = false) const;
+    QColor checkBoxIndicatorColor(const QPalette &palette, bool mouseOver, bool active, qreal opacity = AnimationData::OpacityInvalid, AnimationMode = AnimationNone, bool inMenu = false) const;
 
     //* separator color
     QColor separatorColor() const;
@@ -312,7 +312,7 @@ public:
     void renderButtonFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, const QColor &shadow, bool focus, bool sunken, bool mouseOver, bool active, const QPalette &palette) const;
 
     //* checkbox frame
-    void renderCheckBoxFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, const QPalette &palette, const QColor &shadow, bool focus, bool sunken, bool mouseOver, bool active, CheckBoxState state = CheckOff, bool darkMode = false, bool inMenu = false) const;
+    void renderCheckBoxFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, const QPalette &palette, const QColor &shadow, bool focus, bool sunken, bool mouseOver, bool active, CheckBoxState state = CheckOff, bool inMenu = false) const;
 
     //* button frame
     void renderFlatButtonFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, const QColor &shadow, bool focus, bool sunken, bool mouseOver, bool active) const;
@@ -336,19 +336,19 @@ public:
     void renderCheckBoxBackground(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, bool sunken) const;
 
     //* checkbox
-    void renderCheckBox(QPainter *painter, const QRect &rect, const QColor &background, const QColor &outline, const QColor &tickColor, bool sunken, CheckBoxState state, bool mouseOver, const QPalette &palette, qreal animation = AnimationData::OpacityInvalid, bool active = true, bool darkMode = false, bool inMenu = false) const;
+    void renderCheckBox(QPainter *painter, const QRect &rect, const QColor &background, const QColor &outline, const QColor &tickColor, bool sunken, CheckBoxState state, bool mouseOver, const QPalette &palette, qreal animation = AnimationData::OpacityInvalid, bool active = true, bool inMenu = false) const;
 
     //* radio button
     void renderRadioButtonBackground(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, bool sunken) const;
 
     //* radio button
-    void renderRadioButton(QPainter *painter, const QRect &rect, const QColor &background, const QColor &outline, const QColor &tickColor, bool sunken, bool enabled, RadioButtonState state, const QPalette &palette, qreal animation = AnimationData::OpacityInvalid, bool mouseOver = false, bool darkMode = false, bool inMenu = false) const;
+    void renderRadioButton(QPainter *painter, const QRect &rect, const QColor &background, const QColor &outline, const QColor &tickColor, bool sunken, bool enabled, RadioButtonState state, const QPalette &palette, qreal animation = AnimationData::OpacityInvalid, bool mouseOver = false, bool inMenu = false) const;
 
     //* slider groove
     void renderSliderGroove(QPainter *painter, const QRect &rect, const QColor &) const;
 
     //* slider handle
-    void renderSliderHandle(QPainter *painter, const QRect &rect, const QColor &, const QColor &outline, const QColor &shadow, bool sunken, bool enabled, Side ticks, qreal angle = 0.0, bool darkMode = false) const;
+    void renderSliderHandle(QPainter *painter, const QRect &rect, const QColor &, const QColor &outline, const QColor &shadow, bool sunken, bool enabled, Side ticks, qreal angle = 0.0) const;
 
     //* dial groove
     void renderDialGroove(QPainter *painter, const QRect &rect, const QColor &) const;

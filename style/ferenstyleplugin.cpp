@@ -35,7 +35,7 @@ namespace Feren
     {
         if( key.toLower() == QStringLiteral( "feren" ) )
         {
-            return new Style(false);
+            return new Style();
         }
         return nullptr;
     }

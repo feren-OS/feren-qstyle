@@ -221,7 +221,7 @@ namespace Feren
 {
 
 //______________________________________________________________
-Style::Style(bool dark)
+Style::Style()
     : _addLineButtons(SingleButton)
     , _subLineButtons(SingleButton)
 
@@ -241,7 +241,6 @@ Style::Style(bool dark)
     , SH_ArgbDndWindow(newStyleHint(QStringLiteral("SH_ArgbDndWindow")))
     , CE_CapacityBar(newControlElement(QStringLiteral("CE_CapacityBar")))
 #endif
-    , _dark(dark)
 {
     // use DBus connection to update on feren configuration change
     QDBusConnection dbus = QDBusConnection::sessionBus();
@@ -425,9 +424,8 @@ void Style::polish(QWidget *widget)
     if (QPointer<QAbstractItemView> view = qobject_cast<QAbstractItemView *>(widget)) {
         QPalette pal = view->palette();
         // TODO keep synced with the standard palette
-        const QColor activeTextColor = _dark ? QColor("#eeeeec") : QColor("#2e3436");
-        const QColor inactiveTextColor = _dark ? _helper->mix(QColor("#eeeeec"), _helper->darken(_helper->desaturate(QColor("#3d3846"), 1.0), 0.04)) :
-                                                 _helper->mix(QColor("#2e3436"), QColor("#f6f5f4"));
+        const QColor activeTextColor = QColor("#2e3436");
+        const QColor inactiveTextColor = _helper->mix(QColor("#2e3436"), QColor("#f6f5f4"));
         // No custom text color used, we can do our HACK
         if (inactiveTextColor == pal.color(QPalette::Inactive, QPalette::Text) && activeTextColor == pal.color(QPalette::Active, QPalette::Text)) {
             pal.setColor(QPalette::Inactive, QPalette::Text, pal.color(QPalette::Active, QPalette::Text));
@@ -1287,7 +1285,7 @@ bool Style::eventFilter(QObject *object, QEvent *event)
 
     if ((!widget->parent() || !qobject_cast<QWidget *>(widget->parent()) || qobject_cast<QDialog *>(widget) || qobject_cast<QMainWindow *>(widget))
         && (QEvent::Show == event->type() || QEvent::StyleChange == event->type())) {
-        _helper->setVariant(widget, _dark ? "dark" : "light");
+        _helper->setVariant(widget, "light");
     }
 
     // fallback
@@ -3321,7 +3319,7 @@ bool Style::drawFrameLineEditPrimitive(const QStyleOption *option, QPainter *pai
 
         // render
         QColor background(palette.currentColorGroup() == QPalette::Disabled ? palette.color(QPalette::Window) : palette.color(QPalette::Base));
-        QColor outline(_helper->inputOutlineColor(palette, mouseOver, hasFocus, opacity, mode, _dark));
+        QColor outline(_helper->inputOutlineColor(palette, mouseOver, hasFocus, opacity, mode));
         if (qobject_cast<const QComboBox *>(widget))
             _helper->renderFlatFrame(painter, righttoleft, rect, background, outline, hasFocus);
         else
@@ -3640,8 +3638,8 @@ bool Style::drawPanelButtonCommandPrimitive(const QStyleOption *option, QPainter
     qreal opacity(_animations->widgetStateEngine().buttonOpacity(widget));
 
     QColor shadow(palette.color(QPalette::Shadow));
-    QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode, _dark));
-    QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark));
+    QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode));
+    QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode));
 
     if (flat) {
         // define colors and render
@@ -3693,8 +3691,8 @@ bool Style::drawPanelButtonToolPrimitive(const QStyleOption *option, QPainter *p
     
     // render as push button
     QColor shadow(_helper->shadowColor(palette));
-    QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode, _dark));
-    QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark));
+    QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode));
+    QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode));
 
     if (!autoRaise || mouseOver || sunken) {
         // need to check widget for popup mode, because option is not set properly
@@ -3925,8 +3923,8 @@ bool Style::drawIndicatorCheckBoxPrimitive(const QStyleOption *option, QPainter 
     else if (state & State_On)
         checkBoxState = CheckOn;
 
-    const QColor &outline(_helper->indicatorOutlineColor(palette, mouseOver, false, AnimationData::OpacityInvalid, AnimationNone, checkBoxState, _dark));
-    const QColor &background(_helper->indicatorBackgroundColor(palette, mouseOver, false, sunken, AnimationData::OpacityInvalid, AnimationNone, checkBoxState, _dark));
+    const QColor &outline(_helper->indicatorOutlineColor(palette, mouseOver, false, AnimationData::OpacityInvalid, AnimationNone, checkBoxState));
+    const QColor &background(_helper->indicatorBackgroundColor(palette, mouseOver, false, sunken, AnimationData::OpacityInvalid, AnimationNone, checkBoxState));
 
     // detect checkboxes in lists
     bool isSelectedItem(this->isSelectedItem(widget, rect.center()));
@@ -3952,7 +3950,7 @@ bool Style::drawIndicatorCheckBoxPrimitive(const QStyleOption *option, QPainter 
 
     // render
     QColor shadow(_helper->shadowColor(palette));
-    _helper->renderCheckBox(painter, rect, background, outline, tickColor, sunken, checkBoxState, mouseOver, palette, animation, enabled && windowActive, _dark);
+    _helper->renderCheckBox(painter, rect, background, outline, tickColor, sunken, checkBoxState, mouseOver, palette, animation, enabled && windowActive);
     return true;
 }
 
@@ -3971,8 +3969,8 @@ bool Style::drawIndicatorRadioButtonPrimitive(const QStyleOption *option, QPaint
     bool checked(state & State_On);
     bool windowActive(state & State_Active);
 
-    const QColor &outline(_helper->indicatorOutlineColor(palette, mouseOver, false, AnimationData::OpacityInvalid, AnimationNone, checked ? CheckOn : CheckOff, _dark));
-    const QColor &background(_helper->indicatorBackgroundColor(palette, mouseOver, false, sunken, AnimationData::OpacityInvalid, AnimationNone, checked ? CheckOn : CheckOff,_dark));
+    const QColor &outline(_helper->indicatorOutlineColor(palette, mouseOver, false, AnimationData::OpacityInvalid, AnimationNone, checked ? CheckOn : CheckOff));
+    const QColor &background(_helper->indicatorBackgroundColor(palette, mouseOver, false, sunken, AnimationData::OpacityInvalid, AnimationNone, checked ? CheckOn : CheckOff));
 
     // radio button state
     RadioButtonState radioButtonState(state & State_On ? RadioOn : RadioOff);
@@ -4000,7 +3998,7 @@ bool Style::drawIndicatorRadioButtonPrimitive(const QStyleOption *option, QPaint
     }
 
     // render
-    _helper->renderRadioButton(painter, rect, background, outline, tickColor, sunken, enabled && windowActive, radioButtonState, palette, animation, mouseOver, _dark, false);
+    _helper->renderRadioButton(painter, rect, background, outline, tickColor, sunken, enabled && windowActive, radioButtonState, palette, animation, mouseOver, false);
 
     return true;
 }
@@ -4040,8 +4038,8 @@ bool Style::drawIndicatorButtonDropDownPrimitive(const QStyleOption *option, QPa
 
     // render as push button
     QColor shadow(_helper->shadowColor(palette));
-    QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode, _dark));
-    QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark));
+    QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode));
+    QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode));
 
     QRect frameRect(rect);
     painter->setClipRect(rect);
@@ -4680,9 +4678,8 @@ bool Style::drawItemViewItemControl(const QStyleOption *option, QPainter *painte
 #endif
 #if QT_VERSION > 0x050000
     if (_helper->isWindowActive(widget)) {
-        const QColor activeTextColor = _dark ? QColor("#eeeeec") : QColor("#2e3436");
-        const QColor inactiveTextColor = _dark ? _helper->mix(QColor("#eeeeec"), _helper->darken(_helper->desaturate(QColor("#3d3846"), 1.0), 0.04)) :
-                                                 _helper->mix(QColor("#2e3436"), QColor("#f6f5f4"));
+        const QColor activeTextColor = QColor("#2e3436");
+        const QColor inactiveTextColor = _helper->mix(QColor("#2e3436"), QColor("#f6f5f4"));
         // No custom text color used, we can do our HACK
         QPalette palette = op.palette;
         if (inactiveTextColor == palette.color(QPalette::Inactive, QPalette::Text) && activeTextColor == palette.color(QPalette::Active, QPalette::Text)) {
@@ -4847,7 +4844,7 @@ bool Style::drawMenuItemControl(const QStyleOption *option, QPainter *painter, c
 
     CheckBoxState checkState(menuItemOption->checked ? CheckOn : CheckOff);
     const QColor &outline(palette.foreground().color());
-    const QColor &indicatorBackground(_helper->indicatorBackgroundColor(palette, mouseOver, false, false, AnimationData::OpacityInvalid, AnimationNone, checkState, _dark, true));
+    const QColor &indicatorBackground(_helper->indicatorBackgroundColor(palette, mouseOver, false, false, AnimationData::OpacityInvalid, AnimationNone, checkState, true));
     // render checkbox indicator
     if (menuItemOption->checkType == QStyleOptionMenuItem::NonExclusive) {
         checkBoxRect = visualRect(option, checkBoxRect);
@@ -4862,8 +4859,8 @@ bool Style::drawMenuItemControl(const QStyleOption *option, QPainter *painter, c
         bool active(menuItemOption->checked);
         AnimationMode mode(_animations->widgetStateEngine().isAnimated(widget, AnimationHover) ? AnimationHover : AnimationNone);
         qreal opacity(_animations->widgetStateEngine().opacity(widget, AnimationHover));
-        QColor tickColor = _helper->checkBoxIndicatorColor(palette, mouseOver, enabled && active, opacity, mode, _dark, true);
-        _helper->renderCheckBox(painter, checkBoxRect, indicatorBackground, outline, tickColor, false, checkState, mouseOver, palette, enabled && windowActive, _dark, true);
+        QColor tickColor = _helper->checkBoxIndicatorColor(palette, mouseOver, enabled && active, opacity, mode, true);
+        _helper->renderCheckBox(painter, checkBoxRect, indicatorBackground, outline, tickColor, false, checkState, mouseOver, palette, enabled && windowActive, true);
     } else if (menuItemOption->checkType == QStyleOptionMenuItem::Exclusive) {
         checkBoxRect = visualRect(option, checkBoxRect);
 
@@ -4875,8 +4872,8 @@ bool Style::drawMenuItemControl(const QStyleOption *option, QPainter *painter, c
         bool active(menuItemOption->checked);
         AnimationMode mode(_animations->widgetStateEngine().isAnimated(widget, AnimationHover) ? AnimationHover : AnimationNone);
         qreal opacity(_animations->widgetStateEngine().opacity(widget, AnimationHover));
-        QColor tickColor = _helper->checkBoxIndicatorColor(palette, mouseOver, enabled && active, opacity, mode, _dark, true);
-        _helper->renderRadioButton(painter, checkBoxRect, indicatorBackground, outline, tickColor, false, enabled && windowActive, active ? RadioOn : RadioOff, palette, _dark, true);
+        QColor tickColor = _helper->checkBoxIndicatorColor(palette, mouseOver, enabled && active, opacity, mode, true);
+        _helper->renderRadioButton(painter, checkBoxRect, indicatorBackground, outline, tickColor, false, enabled && windowActive, active ? RadioOn : RadioOff, palette, true);
     }
 
     // icon
@@ -5150,7 +5147,7 @@ bool Style::drawScrollBarSliderControl(const QStyleOption *option, QPainter *pai
 
     AnimationMode mode(_animations->scrollBarEngine().animationMode(widget, SC_ScrollBarSlider));
     qreal opacity(_animations->scrollBarEngine().opacity(widget, SC_ScrollBarSlider));
-    QColor color = _helper->scrollBarHandleColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark);
+    QColor color = _helper->scrollBarHandleColor(palette, mouseOver, hasFocus, sunken, opacity, mode);
     if (mouseOver)
         opacity = 1;
     else
@@ -6186,8 +6183,8 @@ bool Style::drawComboBoxComplexControl(const QStyleOptionComplex *option, QPaint
                 
                 // define colors
                 QColor shadow(_helper->shadowColor(palette));
-                QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode, _dark));
-                QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark));
+                QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode));
+                QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode));
 
                 // render
                 _helper->renderButtonFrame(painter, rect, background, outline, shadow, hasFocus, sunken, mouseOver, enabled && windowActive, palette);
@@ -6204,8 +6201,8 @@ bool Style::drawComboBoxComplexControl(const QStyleOptionComplex *option, QPaint
             qreal opacity(_animations->inputWidgetEngine().buttonOpacity(widget));
             // define colors
             QColor shadow(_helper->shadowColor(palette));
-            QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode, _dark));
-            QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark));
+            QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode));
+            QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode));
 
             if (flat) {
                 // define colors and render
@@ -6218,8 +6215,8 @@ bool Style::drawComboBoxComplexControl(const QStyleOptionComplex *option, QPaint
             } else {
                 // define colors
                 QColor shadow(_helper->shadowColor(palette));
-                QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode, _dark));
-                QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode, _dark));
+                QColor outline(_helper->buttonOutlineColor(palette, mouseOver, hasFocus, opacity, mode));
+                QColor background(_helper->buttonBackgroundColor(palette, mouseOver, hasFocus, sunken, opacity, mode));
 
                 // render
                 _helper->renderButtonFrame(painter, rect, background, outline, shadow, hasFocus, sunken, mouseOver, enabled && windowActive, palette);
@@ -6448,12 +6445,12 @@ bool Style::drawSliderComplexControl(const QStyleOptionComplex *option, QPainter
         qreal opacity(_animations->widgetStateEngine().buttonOpacity(widget));
 
         // define colors
-        QColor background(_helper->indicatorBackgroundColor(palette, mouseOver, false, false, opacity, AnimationNone, CheckOff, _dark, true));
+        QColor background(_helper->indicatorBackgroundColor(palette, mouseOver, false, false, opacity, AnimationNone, CheckOff, true));
         QColor outline = QColor();
         if (sunken) {
             outline = option->palette.color(QPalette::Highlight);
         } else {
-            outline = _helper->buttonOutlineColor(palette, false, hasFocus, opacity, mode, _dark);
+            outline = _helper->buttonOutlineColor(palette, false, hasFocus, opacity, mode);
         }
         QColor shadow(_helper->shadowColor(palette));
 
@@ -6539,7 +6536,7 @@ bool Style::drawDialComplexControl(const QStyleOptionComplex *option, QPainter *
         if (sunken) {
             outline = option->palette.color(QPalette::Highlight);
         } else {
-            outline = _helper->buttonOutlineColor(palette, false, hasFocus, opacity, mode, _dark);
+            outline = _helper->buttonOutlineColor(palette, false, hasFocus, opacity, mode);
         }
         QColor shadow(_helper->shadowColor(palette));
 
