@@ -153,7 +153,7 @@ namespace Feren
         ComboBox_MarginHeight = 4,
         ComboBox_MarginWidth = 8,
         ComboBox_MinHeight = 24,
-        ComboBox_MinWidth = 69,
+        ComboBox_MinWidth = 74,
 
         // spinbox
         SpinBox_FrameWidth = LineEdit_FrameWidth,
@@ -168,7 +168,7 @@ namespace Feren
 
         // buttons
         Button_MinHeight = 24,
-        Button_MinWidth = 69, //nice
+        Button_MinWidth = 74,
         Button_MarginHeight = 4,
         Button_MarginWidth = 8,
         Button_ItemSpacing = 4,

@@ -297,7 +297,7 @@ public:
     void renderSquareFrame(QPainter *painter, const QRect &rect, QColor color, bool hasFocus) const;
 
     //* generic frame flat on right side
-    void renderFlatFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline = QColor(), bool hasFocus = false) const;
+    void renderFlatFrame(QPainter *painter, bool righttoleft, const QRect &rect, const QColor &color, const QColor &outline = QColor(), bool hasFocus = false) const;
 
     //* side panel frame
     void renderSidePanelFrame(QPainter *painter, const QRect &rect, const QColor &outline, Side) const;

@@ -469,7 +469,7 @@ void Helper::renderSquareFrame(QPainter *painter, const QRect &rect, QColor colo
 }
 
 //______________________________________________________________________________
-void Helper::renderFlatFrame(QPainter *painter, const QRect &rect, const QColor &color, const QColor &outline, bool hasFocus) const
+void Helper::renderFlatFrame(QPainter *painter, bool righttoleft, const QRect &rect, const QColor &color, const QColor &outline, bool hasFocus) const
 {
     painter->setRenderHint(QPainter::Antialiasing);
 
@@ -498,7 +498,11 @@ void Helper::renderFlatFrame(QPainter *painter, const QRect &rect, const QColor 
 
     QPainterPath path;
     path.setFillRule(Qt::WindingFill);
-    path.addRect(frameRect.adjusted(2 * radius, 0, 0, 0));
+    if (righttoleft) {
+        path.addRect(frameRect.adjusted(0, 0, 2 * radius, 0));        
+    } else {
+        path.addRect(frameRect.adjusted(2 * radius, 0, 0, 0));
+    }
     path.addRoundedRect(frameRect.adjusted(0, 0, - 2 * radius, 0), radius, radius);
 
     painter->drawPath(path.simplified());

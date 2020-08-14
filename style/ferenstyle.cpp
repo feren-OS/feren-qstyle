@@ -2366,57 +2366,64 @@ QRect Style::toolButtonSubControlRect(const QStyleOptionComplex *option, SubCont
 }
 
 //___________________________________________________________________________________________________________________
-QRect Style::comboBoxSubControlRect(const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
+QRect Style::comboBoxSubControlRect( const QStyleOptionComplex* option, SubControl subControl, const QWidget* widget ) const
 {
     // cast option and check
-    const QStyleOptionComboBox *comboBoxOption(qstyleoption_cast<const QStyleOptionComboBox *>(option));
-    if (!comboBoxOption)
-        return ParentStyleClass::subControlRect(CC_ComboBox, option, subControl, widget);
+    const auto comboBoxOption( qstyleoption_cast<const QStyleOptionComboBox*>( option ) );
+    if( !comboBoxOption ) return ParentStyleClass::subControlRect( CC_ComboBox, option, subControl, widget );
 
-    bool editable(comboBoxOption->editable);
-    bool flat(editable && !comboBoxOption->frame);
+    const bool editable( comboBoxOption->editable );
+    const bool flat( editable && !comboBoxOption->frame );
 
     // copy rect
-    QRect rect(option->rect);
+    auto rect( option->rect );
 
-    switch (subControl) {
-    case SC_ComboBoxFrame:
-        return flat ? rect : QRect();
-    case SC_ComboBoxListBoxPopup:
-        return rect;
+    switch( subControl )
+    {
+        case SC_ComboBoxFrame: return flat ? rect : QRect();
+        case SC_ComboBoxListBoxPopup: return rect;
 
-    case SC_ComboBoxArrow: {
-        QRect arrowRect(
-            rect.right() - rect.height() + 1,
-            rect.top(),
-            rect.height(),
-            rect.height());
+        case SC_ComboBoxArrow:
+        {
 
-        return arrowRect;
-    }
+            // take out frame width
+            if( !flat ) rect = insideMargin( rect, Metrics::Frame_FrameWidth );
 
-    case SC_ComboBoxEditField: {
-        QRect labelRect;
-        int frameWidth(pixelMetric(PM_ComboBoxFrameWidth, option, widget));
-        labelRect = QRect(
-                        rect.left(), rect.top(),
-                        rect.width() - rect.height() - 4,
-                        rect.height());
+            QRect arrowRect(
+                rect.right() - Metrics::MenuButton_IndicatorWidth - 1,
+                rect.top(),
+                Metrics::MenuButton_IndicatorWidth,
+                rect.height() );
 
-        // remove margins
-        if (!flat && rect.height() >= option->fontMetrics.height() + 2 * frameWidth) {
-            labelRect.adjust(frameWidth, frameWidth, 0, -frameWidth);
+            arrowRect = centerRect( arrowRect, Metrics::MenuButton_IndicatorWidth, Metrics::MenuButton_IndicatorWidth );
+            return visualRect( option, arrowRect );
+
         }
 
-        return visualRect(option, labelRect);
+        case SC_ComboBoxEditField:
+        {
+
+            QRect labelRect;
+            const int frameWidth( pixelMetric( PM_ComboBoxFrameWidth, option, widget ) );
+            labelRect = QRect(
+                rect.left(), rect.top(),
+                rect.width() - rect.height(),
+                rect.height() );
+
+            // remove margins
+            if( !flat && rect.height() >= option->fontMetrics.height() + 2*frameWidth )
+            { labelRect.adjust( frameWidth, frameWidth, 0, -frameWidth ); }
+
+            return visualRect( option, labelRect );
+
+        }
+
+        default: break;
+
     }
 
-    default:
-        break;
+    return ParentStyleClass::subControlRect( CC_ComboBox, option, subControl, widget );
 
-    }
-
-    return ParentStyleClass::subControlRect(CC_ComboBox, option, subControl, widget);
 }
 
 //___________________________________________________________________________________________________________________
@@ -2961,14 +2968,12 @@ QSize Style::menuItemSizeFromContents(const QStyleOption *option, const QSize &c
     case QStyleOptionMenuItem::DefaultItem:
     case QStyleOptionMenuItem::SubMenu: {
 
-        int iconWidth = 0;
-        if (showIconsInMenuItems())
-            iconWidth = isQtQuickControl(option, widget) ? qMax(pixelMetric(PM_SmallIconSize, option, widget), menuItemOption->maxIconWidth) : menuItemOption->maxIconWidth;
+        int iconWidth = menuItemOption->maxIconWidth;
 
         int leftColumnWidth(iconWidth);
 
         // add space with respect to text
-        leftColumnWidth += Metrics::MenuItem_ItemSpacing;
+        if ( iconWidth ) leftColumnWidth += Metrics::MenuItem_ItemSpacing;
 
         // add checkbox indicator width
         if (menuItemOption->menuHasCheckableItems) {
@@ -3274,6 +3279,7 @@ bool Style::drawFrameLineEditPrimitive(const QStyleOption *option, QPainter *pai
         bool enabled(state & State_Enabled);
         bool mouseOver((state & State_Active) && enabled && (state & State_MouseOver));
         bool hasFocus(enabled && (state & State_HasFocus));
+        bool righttoleft(option->direction == Qt::RightToLeft);
 
         // focus takes precedence over mouse over
         _animations->inputWidgetEngine().updateState(widget, AnimationFocus, hasFocus);
@@ -3286,7 +3292,7 @@ bool Style::drawFrameLineEditPrimitive(const QStyleOption *option, QPainter *pai
         QColor background(palette.currentColorGroup() == QPalette::Disabled ? palette.color(QPalette::Window) : palette.color(QPalette::Base));
         QColor outline(_helper->inputOutlineColor(palette, mouseOver, hasFocus, opacity, mode, _dark));
         if (qobject_cast<const QComboBox *>(widget))
-            _helper->renderFlatFrame(painter, rect, background, outline, hasFocus);
+            _helper->renderFlatFrame(painter, righttoleft, rect, background, outline, hasFocus);
         else
             _helper->renderFrame(painter, rect, background, outline, hasFocus);
     }
@@ -4806,7 +4812,7 @@ bool Style::drawMenuItemControl(const QStyleOption *option, QPainter *painter, c
     }
 
     // We want to always to keep the space for checkbox
-    contentsRect.setLeft(Metrics::CheckBox_Size + Metrics::MenuItem_ItemSpacing);
+    contentsRect.setLeft(rect.left() + Metrics::CheckBox_Size + Metrics::MenuItem_ItemSpacing);
 
     CheckBoxState checkState(menuItemOption->checked ? CheckOn : CheckOff);
     const QColor &outline(palette.foreground().color());
@@ -6163,9 +6169,11 @@ bool Style::drawComboBoxComplexControl(const QStyleOptionComplex *option, QPaint
                 _helper->renderButtonFrame(painter, rect, background, outline, shadow, hasFocus, sunken, mouseOver, enabled && windowActive, palette);
 
                 QStyleOptionComplex tmpOpt(*option);
-                tmpOpt.rect.setWidth(tmpOpt.rect.width() - subControlRect(CC_ComboBox, option, SC_ComboBoxArrow, widget).width() + 3);
+                tmpOpt.rect.setWidth(option->rect.width() - Metrics::MenuButton_IndicatorWidth*1.5);
+                if (option->direction == Qt::RightToLeft)
+                    tmpOpt.rect.adjust(Metrics::MenuButton_IndicatorWidth*1.5, 0, Metrics::MenuButton_IndicatorWidth*1.5, 0);
 
-                drawPrimitive(PE_FrameLineEdit, &tmpOpt, painter, widget);
+                drawPrimitive( PE_FrameLineEdit, &tmpOpt, painter, widget );
             }
         } else {
             AnimationMode mode(_animations->inputWidgetEngine().buttonAnimationMode(widget));
