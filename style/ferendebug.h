@@ -17,11 +17,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .        *
  *************************************************************************/
 
-#ifndef ADWAITA_DEBUG_H
-#define ADWAITA_DEBUG_H
+#ifndef FEREN_DEBUG_H
+#define FEREN_DEBUG_H
 
 #include <QLoggingCategory>
 
-Q_DECLARE_LOGGING_CATEGORY(ADWAITA)
+Q_DECLARE_LOGGING_CATEGORY(FEREN)
 
-#endif // ADWAITA_DEBUG_H
+#endif // FEREN_DEBUG_H

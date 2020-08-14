@@ -19,14 +19,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .        *
  *************************************************************************/
 
-#ifndef ADWAITA_STYLE_H
-#define ADWAITA_STYLE_H
+#ifndef FEREN_STYLE_H
+#define FEREN_STYLE_H
 
 #include "feren.h"
 #include "config-feren.h"
 
-#if ADWAITA_USE_KDE4
-#include "kstylekde4compat.h"
+#if FEREN_HAVE_KSTYLE
+#include <KStyle>
 #endif
 
 #include <QAbstractItemView>
@@ -60,11 +60,11 @@ class WindowManager;
 class BlurHelper;
 
 //* convenience typedef for base class
-#if ADWAITA_USE_KDE4
-using ParentStyleClass = KStyleKDE4Compat;
-#else
-using ParentStyleClass = QCommonStyle;
-#endif
+//#if !FEREN_HAVE_KSTYLE
+//using ParentStyleClass = QCommonStyle;
+//#else
+using ParentStyleClass = KStyle;
+//#endif
 
 //* base class for feren style
 /** it is responsible to draw all the primitives to be displayed on screen, on request from Qt paint engine */
@@ -80,7 +80,7 @@ public:
     explicit Style();
 
     //* destructor
-    virtual ~Style(void);
+    ~Style() override;
 
     //* needed to avoid warnings at compilation time
     using ParentStyleClass::polish;
@@ -625,5 +625,5 @@ template< typename T > bool Style::hasParent(const QWidget *widget) const
 
 } // namespace Feren
 
-#endif // ADWAITA_STYLE_H
+#endif // FEREN_STYLE_H
 

@@ -30,25 +30,20 @@ namespace Feren
 
         Q_OBJECT
 
-        #if QT_VERSION >= 0x050000
         Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QStyleFactoryInterface" FILE "feren.json" )
-        #endif
 
         public:
 
         //* constructor
-        explicit StylePlugin(QObject *parent = 0):
+        explicit StylePlugin(QObject *parent = nullptr):
             QStylePlugin(parent)
         {}
-
-        //* destructor
-        ~StylePlugin();
 
         //* returns list of valid keys
         QStringList keys() const;
 
         //* create style
-        QStyle* create( const QString& );
+        QStyle* create( const QString& ) override;
 
     };
 

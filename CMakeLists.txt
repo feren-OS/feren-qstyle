@@ -1,14 +1,24 @@
 project(Feren)
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.0)
 
 set(KF5_MIN_VERSION "5.66.0")
+
+include(GenerateExportHeader)
+include(WriteBasicConfigVersionFile)
+include(FeatureSummary)
 
 set(CMAKE_AUTOMOC ON)
 add_definitions(-std=c++11)
 
 find_package(ECM ${KF5_MIN_VERSION} REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_SOURCE_DIR}/cmake)
+
+include(ECMInstallIcons)
+include(KDEInstallDirs)
+include(KDECMakeSettings)
+include(KDECompilerSettings NO_POLICY_SCOPE)
+include(KDEClangFormat)
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
@@ -48,3 +58,5 @@ if (BUILD_EXAMPLE)
 endif()
 
 add_subdirectory(style)
+
+feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

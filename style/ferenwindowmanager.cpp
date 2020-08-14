@@ -79,11 +79,11 @@
 #include <QWindow>
 #endif
 
-#if ADWAITA_HAVE_X11
+#if FEREN_HAVE_X11
 #include <QX11Info>
 #include <xcb/xcb.h>
 
-#if ADWAITA_USE_KDE4
+#if FEREN_USE_KDE4
 #include <NETRootInfo>
 #else
 #include <NETWM>
@@ -148,7 +148,7 @@ namespace Feren
         bool appMouseEvent( QObject*, QEvent* event )
         {
 
-            #if ADWAITA_USE_KDE4
+            #if FEREN_USE_KDE4
             // store target window (see later)
             QWidget* window( _parent->_target.data()->window() );
             #else
@@ -162,7 +162,7 @@ namespace Feren
             QMouseEvent mouseEvent( QEvent::MouseButtonRelease, _parent->_dragPoint, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier );
             qApp->sendEvent( _parent->_target.data(), &mouseEvent );
 
-            #if ADWAITA_USE_KDE4
+            #if FEREN_USE_KDE4
             if( event->type() == QEvent::MouseMove )
             {
                 /*
@@ -757,7 +757,7 @@ namespace Feren
     //_______________________________________________________
     void WindowManager::startDragX11( QWidget* widget, const QPoint& position )
     {
-        #if ADWAITA_HAVE_X11
+        #if FEREN_HAVE_X11
         // connection
         xcb_connection_t* connection( Helper::connection() );
 
@@ -774,7 +774,7 @@ namespace Feren
         qreal dpiRatio = 1;
         #endif
 
-        #if ADWAITA_USE_KDE4
+        #if FEREN_USE_KDE4
         Display* net_connection = QX11Info::display();
         #else
         xcb_connection_t* net_connection = connection;
@@ -797,7 +797,7 @@ namespace Feren
     //____________________________________________________________
     bool WindowManager::supportWMMoveResize( void ) const
     {
-        #if ADWAITA_HAVE_X11
+        #if FEREN_HAVE_X11
         return Helper::isX11();
         #else
         return false;

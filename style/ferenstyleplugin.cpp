@@ -35,18 +35,13 @@ namespace Feren
     {
         if( key.toLower() == QStringLiteral( "feren" ) )
         {
-            return new Style();
+            return new Style;
         }
         return nullptr;
     }
 
     //_________________________________________________
-    StylePlugin::~StylePlugin()
-    {
-    }
-
-    //_________________________________________________
     QStringList StylePlugin::keys() const
-    { return QStringList() << QStringLiteral( "Feren" ); }
+    { return QStringList( QStringLiteral( "Feren" ) ); }
 
 }

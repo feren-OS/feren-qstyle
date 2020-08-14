@@ -18,8 +18,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .        *
  *************************************************************************/
 
-#ifndef ADWAITA_H
-#define ADWAITA_H
+#ifndef FEREN_H
+#define FEREN_H
 
 #include <QColor>
 #include <QFlags>
@@ -331,5 +331,5 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Feren::AnimationModes)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Feren::Corners)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Feren::Sides)
 
-#endif // ADWAITA_H
+#endif // FEREN_H
 

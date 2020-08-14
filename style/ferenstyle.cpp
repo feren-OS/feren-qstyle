@@ -225,7 +225,7 @@ Style::Style()
     : _addLineButtons(SingleButton)
     , _subLineButtons(SingleButton)
 
-#if ADWAITA_USE_KDE4
+#if FEREN_USE_KDE4
     , _helper(new Helper("feren"))
 #else
     , _helper(new Helper())
@@ -237,9 +237,9 @@ Style::Style()
     , _splitterFactory(new SplitterFactory(this))
     , _widgetExplorer(new WidgetExplorer(this))
     , _tabBarData(new FerenPrivate::TabBarData(this))
-#if ADWAITA_USE_KDE4
-    , SH_ArgbDndWindow(newStyleHint(QStringLiteral("SH_ArgbDndWindow")))
-    , CE_CapacityBar(newControlElement(QStringLiteral("CE_CapacityBar")))
+#if FEREN_HAVE_KSTYLE
+    , SH_ArgbDndWindow( newStyleHint( QStringLiteral( "SH_ArgbDndWindow" ) ) )
+    , CE_CapacityBar( newControlElement( QStringLiteral( "CE_CapacityBar" ) ) )
 #endif
 {
     // use DBus connection to update on feren configuration change
@@ -250,6 +250,10 @@ Style::Style()
             QStringLiteral( "reparseConfiguration" ), this, SLOT(configurationChanged()) );
 
     dbus.connect( QString(),
+            QStringLiteral( "/BreezeDecoration" ),
+            QStringLiteral( "org.kde.Breeze.Style" ),
+            QStringLiteral( "reparseConfiguration" ), this, SLOT(configurationChanged()) );
+    dbus.connect( QString(),
             QStringLiteral( "/KGlobalSettings" ),
             QStringLiteral( "org.kde.KGlobalSettings" ),
             QStringLiteral( "notifyChange" ), this, SLOT(configurationChanged()) );
@@ -258,8 +262,12 @@ Style::Style()
     // For GNOME desktop, dont want translucent backgrounds otherwise no menu shadow is drawn.
     _isKDE = qgetenv("XDG_CURRENT_DESKTOP").toLower() == "kde";
     _isGNOME = qgetenv("XDG_CURRENT_DESKTOP").toLower() == "gnome";
-
+    
+    #if QT_VERSION < 0x050D00 // Check if Qt version < 5.13
+    this->addEventFilter(qApp);
+    #else
     connect(qApp, &QApplication::paletteChanged, this, &Style::configurationChanged);
+    #endif
     // call the slot directly; this initial call will set up things that also
     // need to be reset when the system palette changes
     loadConfiguration();
@@ -1071,7 +1079,7 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 {
     StyleControl fcn(nullptr);
 
-#if ADWAITA_USE_KDE4
+#if FEREN_USE_KDE4
     if (element == CE_CapacityBar) {
         fcn = &Style::drawProgressBarControl;
     } else

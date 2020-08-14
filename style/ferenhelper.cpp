@@ -31,7 +31,7 @@
 #include <QPainter>
 #include <QLibrary>
 
-#if ADWAITA_HAVE_X11 && QT_VERSION < 0x050000
+#if FEREN_HAVE_X11 && QT_VERSION < 0x050000
 #include <X11/Xlib-xcb.h>
 #endif
 
@@ -48,7 +48,7 @@ Helper::Helper()
 }
 
 //____________________________________________________________________
-#if ADWAITA_USE_KDE4
+#if FEREN_USE_KDE4
 Helper::Helper(const QByteArray &name)
 {
     init();
@@ -1600,7 +1600,7 @@ QPixmap Helper::coloredIcon(const QIcon& icon,  const QPalette& palette, const Q
     return pixmap;
 }
 
-#if ADWAITA_HAVE_X11
+#if FEREN_HAVE_X11
 
 //____________________________________________________________________
 xcb_connection_t *Helper::connection(void)
@@ -1635,7 +1635,7 @@ xcb_atom_t Helper::createAtom(const QString &name) const
 //____________________________________________________________________
 void Helper::init(void)
 {
-#if ADWAITA_HAVE_X11
+#if FEREN_HAVE_X11
     if (isX11()) {
         // create compositing screen
         QString atomName(QStringLiteral("_NET_WM_CM_S%1").arg(QX11Info::appScreen()));

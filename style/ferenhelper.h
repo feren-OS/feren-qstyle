@@ -19,8 +19,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .        *
  *************************************************************************/
 
-#ifndef ADWAITA_HELPER_H
-#define ADWAITA_HELPER_H
+#ifndef FEREN_HELPER_H
+#define FEREN_HELPER_H
 
 #include "feren.h"
 #include "ferenanimationdata.h"
@@ -37,7 +37,7 @@
 #include <QWindow>
 #endif
 
-#if ADWAITA_HAVE_X11
+#if FEREN_HAVE_X11
 #include <QX11Info>
 #include <xcb/xcb.h>
 #endif
@@ -56,7 +56,7 @@ public:
     //* constructor
     explicit Helper();
 
-#if ADWAITA_USE_KDE4
+#if FEREN_USE_KDE4
     //* constructor
     explicit Helper(const QByteArray &);
 #endif
@@ -444,7 +444,7 @@ public:
     //*@name X11 utilities
     //@{
 
-#if ADWAITA_HAVE_X11
+#if FEREN_HAVE_X11
 
     //* get xcb connection
     static xcb_connection_t *connection(void);
@@ -477,7 +477,7 @@ protected:
 
 private:
 
-#if ADWAITA_HAVE_X11
+#if FEREN_HAVE_X11
 
     //* atom used for compositing manager
     xcb_atom_t _compositingManagerAtom;
