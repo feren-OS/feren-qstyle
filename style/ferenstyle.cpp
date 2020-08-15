@@ -6787,7 +6787,9 @@ void Style::renderSpinBoxArrow(const SubControl &subControl, const QStyleOptionS
 
     if (true) {
         painter->setPen(Qt::NoPen);
-        QColor background = _helper->alphaColor(palette.color(QPalette::Text), ((opacity * 0.046) + (pressedOpacity * 0.052)));
+        //Currently too buggy in System Settings, etc for a spinbutton focus-background
+        QColor background = Qt::transparent;
+        //QColor background = _helper->alphaColor(palette.color(QPalette::Text), ((opacity * 0.046) + (pressedOpacity * 0.052)));
         painter->setBrush(background);
         painter->drawRect(arrowRect.adjusted(1, 3, -1, -2));
     }
