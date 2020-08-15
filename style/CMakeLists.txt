@@ -92,7 +92,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/debug/
 )
 
-set(LIBRARY_NAME "feren-qt${QT_VERSION_NUMBER}")
+set(LIBRARY_NAME "feren-qstyle")
 
 add_library(${LIBRARY_NAME} MODULE ${Feren_SRCS})
 target_link_libraries(${LIBRARY_NAME} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDBUS_LIBRARY})
