@@ -2441,7 +2441,7 @@ QRect Style::spinBoxSubControlRect(const QStyleOptionComplex *option, SubControl
         return flat ? QRect() : rect;
 
     case SC_SpinBoxUp:
-        if (rect.width() > 2 * rect.height() + 24) {
+        if (rect.width() > 2 * rect.height() + 34) {
             if (reverseLayout) {
                 return QRect(rect.left() + 1,
                             rect.top(),
@@ -2468,7 +2468,7 @@ QRect Style::spinBoxSubControlRect(const QStyleOptionComplex *option, SubControl
         }
 
     case SC_SpinBoxDown: {
-        if (rect.width() > 2 * rect.height() + 24) {
+        if (rect.width() > 2 * rect.height() + 34) {
             if (reverseLayout) {
                 return QRect(rect.left() + rect.height(),
                             rect.top(),
@@ -6787,7 +6787,7 @@ void Style::renderSpinBoxArrow(const SubControl &subControl, const QStyleOptionS
 
     if (true) {
         painter->setPen(Qt::NoPen);
-        QColor background = _helper->alphaColor(palette.text().color(), (opacity * 0.046) + (pressedOpacity * 0.052));
+        QColor background = _helper->alphaColor(palette.color(QPalette::Text), ((opacity * 0.046) + (pressedOpacity * 0.052)));
         painter->setBrush(background);
         painter->drawRect(arrowRect.adjusted(1, 3, -1, -2));
     }
