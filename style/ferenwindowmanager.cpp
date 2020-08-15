@@ -83,11 +83,7 @@
 #include <QX11Info>
 #include <xcb/xcb.h>
 
-#if FEREN_USE_KDE4
-#include <NETRootInfo>
-#else
 #include <NETWM>
-#endif
 
 #endif
 
@@ -148,12 +144,7 @@ namespace Feren
         bool appMouseEvent( QObject*, QEvent* event )
         {
 
-            #if FEREN_USE_KDE4
-            // store target window (see later)
-            QWidget* window( _parent->_target.data()->window() );
-            #else
             Q_UNUSED( event );
-            #endif
 
             /*
             post some mouseRelease event to the target, in order to counter balance
@@ -161,22 +152,6 @@ namespace Feren
             */
             QMouseEvent mouseEvent( QEvent::MouseButtonRelease, _parent->_dragPoint, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier );
             qApp->sendEvent( _parent->_target.data(), &mouseEvent );
-
-            #if FEREN_USE_KDE4
-            if( event->type() == QEvent::MouseMove )
-            {
-                /*
-                HACK: quickly move the main cursor out of the window and back
-                this is needed to get the focus right for the window children
-                the origin of this issue is unknown at the moment.
-                This apparently got fixed with qt5
-                */
-                QPoint cursor = QCursor::pos();
-                QCursor::setPos(window->mapToGlobal( window->rect().topRight() ) + QPoint(1, 0) );
-                QCursor::setPos(cursor);
-
-            }
-            #endif
 
             return false;
 
@@ -774,11 +749,7 @@ namespace Feren
         qreal dpiRatio = 1;
         #endif
 
-        #if FEREN_USE_KDE4
-        Display* net_connection = QX11Info::display();
-        #else
         xcb_connection_t* net_connection = connection;
-        #endif
 
         xcb_ungrab_pointer( connection, XCB_TIME_CURRENT_TIME );
         NETRootInfo( net_connection, NET::WMMoveResize ).moveResizeRequest(

@@ -56,11 +56,6 @@ public:
     //* constructor
     explicit Helper();
 
-#if FEREN_USE_KDE4
-    //* constructor
-    explicit Helper(const QByteArray &);
-#endif
-
     //* destructor
     virtual ~Helper()
     {}

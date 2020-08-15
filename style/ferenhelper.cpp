@@ -48,14 +48,6 @@ Helper::Helper()
 }
 
 //____________________________________________________________________
-#if FEREN_USE_KDE4
-Helper::Helper(const QByteArray &name)
-{
-    init();
-}
-#endif
-
-//____________________________________________________________________
 void Helper::loadConfig()
 {
     QPalette paletteold( QApplication::palette() );

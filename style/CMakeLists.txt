@@ -92,16 +92,28 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/debug/
 )
 
-set(LIBRARY_NAME "feren-qstyle")
+set(LIBRARY_NAME "feren-qt${QT_VERSION_NUMBER}")
 
 add_library(${LIBRARY_NAME} MODULE ${Feren_SRCS})
 target_link_libraries(${LIBRARY_NAME} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDBUS_LIBRARY})
+
 if( FEREN_HAVE_QTQUICK )
     target_link_libraries(${LIBRARY_NAME} Qt5::Quick)
 endif()
+
 if(KF5FrameworkIntegration_FOUND)
     target_link_libraries(${LIBRARY_NAME} KF5::Style)
 endif()
+
+if(FEREN_HAVE_X11)
+    target_link_libraries(${LIBRARY_NAME} ${XCB_LIBRARIES})
+    target_link_libraries(${LIBRARY_NAME} Qt5::X11Extras)
+endif()
+
+if(FEREN_HAVE_KWAYLAND)
+    target_link_libraries(${LIBRARY_NAME} KF5::WaylandClient)
+endif()
+
 target_link_libraries(${LIBRARY_NAME} KF5::ConfigCore KF5::ConfigWidgets KF5::GuiAddons KF5::IconThemes KF5::WindowSystem KF5::Style)
 set_target_properties(${LIBRARY_NAME} PROPERTIES
     LINK_FLAGS "-Wl,--no-undefined"

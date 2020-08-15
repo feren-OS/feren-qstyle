@@ -60,11 +60,11 @@ class WindowManager;
 class BlurHelper;
 
 //* convenience typedef for base class
-//#if !FEREN_HAVE_KSTYLE
-//using ParentStyleClass = QCommonStyle;
-//#else
+#if !FEREN_HAVE_KSTYLE
+using ParentStyleClass = QCommonStyle;
+#else
 using ParentStyleClass = KStyle;
-//#endif
+#endif
 
 //* base class for feren style
 /** it is responsible to draw all the primitives to be displayed on screen, on request from Qt paint engine */

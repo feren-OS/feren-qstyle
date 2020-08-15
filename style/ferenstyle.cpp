@@ -225,11 +225,7 @@ Style::Style()
     : _addLineButtons(SingleButton)
     , _subLineButtons(SingleButton)
 
-#if FEREN_USE_KDE4
-    , _helper(new Helper("feren"))
-#else
     , _helper(new Helper())
-#endif
     , _animations(new Animations(this))
     , _mnemonics(new Mnemonics(this))
     , _blurHelper( new BlurHelper( this ) )
@@ -1079,11 +1075,6 @@ void Style::drawControl(ControlElement element, const QStyleOption *option, QPai
 {
     StyleControl fcn(nullptr);
 
-#if FEREN_USE_KDE4
-    if (element == CE_CapacityBar) {
-        fcn = &Style::drawProgressBarControl;
-    } else
-#endif
         switch (element) {
         case CE_PushButtonBevel:
             fcn = &Style::drawPanelButtonCommandPrimitive;
