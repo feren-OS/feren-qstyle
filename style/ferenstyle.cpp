@@ -33,6 +33,7 @@
 #include <KColorUtils>
 #include <KConfigGroup>
 #include <KSharedConfig>
+#include <KWindowEffects>
 
 #include <QApplication>
 #include <QCheckBox>
@@ -3365,8 +3366,16 @@ bool Style::drawFrameMenuPrimitive(const QStyleOption *option, QPainter *painter
         const QPalette &palette(option->palette);
         QColor background(_helper->menuBackgroundColor(palette));
         QColor outline(_helper->menuOutlineColor(palette));
+        
+        painter->save();
 
         bool hasAlpha(_helper->hasAlphaChannel(widget));
+        if (_helper->compositingActive() && KWindowEffects::isEffectAvailable(KWindowEffects::BlurBehind) && hasAlpha) {
+            if ( painter && widget && widget->isWindow() ) {
+                painter->setCompositionMode( QPainter::CompositionMode_Source );
+            }
+            background.setAlphaF(0.7);
+        }
         _helper->renderMenuFrame(painter, option->rect, background, outline, palette);
     } else if (isQtQuickControl(option, widget)) {
         const QPalette &palette(option->palette);
@@ -3374,6 +3383,12 @@ bool Style::drawFrameMenuPrimitive(const QStyleOption *option, QPainter *painter
         QColor outline(_helper->menuOutlineColor(palette));
 
         bool hasAlpha(_helper->hasAlphaChannel(widget));
+        if (_helper->compositingActive() && KWindowEffects::isEffectAvailable(KWindowEffects::BlurBehind) && hasAlpha) {
+            if ( painter && widget && widget->isWindow() ) {
+                painter->setCompositionMode( QPainter::CompositionMode_Source );
+            }
+            background.setAlphaF(0.7);
+        }
         _helper->renderMenuFrame(painter, option->rect, background, outline, palette);
     }
 
@@ -3802,6 +3817,12 @@ bool Style::drawPanelMenuPrimitive(const QStyleOption *option, QPainter *painter
     QColor outline(_helper->menuOutlineColor(palette));
 
     bool hasAlpha(_helper->hasAlphaChannel(widget));
+    if (_helper->compositingActive() && KWindowEffects::isEffectAvailable(KWindowEffects::BlurBehind) && hasAlpha) {
+        if ( painter && widget && widget->isWindow() ) {
+            painter->setCompositionMode( QPainter::CompositionMode_Source );
+        }
+        background.setAlphaF(0.7);
+    }
     _helper->renderMenuFrame(painter, option->rect, background, outline, palette);
 
     return true;

@@ -129,9 +129,6 @@ QColor Helper::frameBackgroundColor(const QPalette &palette, QPalette::ColorGrou
 QColor Helper::menuBackgroundColor(const QPalette &palette, QPalette::ColorGroup group) const
 {
     QColor color = palette.color(group, QPalette::Base);
-    if (compositingActive()) {
-        color.setAlphaF(0.7);
-    }
     return color;
 }
 
