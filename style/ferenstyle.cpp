@@ -5168,10 +5168,11 @@ bool Style::drawScrollBarSliderControl(const QStyleOption *option, QPainter *pai
     AnimationMode mode(_animations->scrollBarEngine().animationMode(widget, SC_ScrollBarSlider));
     qreal opacity(_animations->scrollBarEngine().opacity(widget, SC_ScrollBarSlider));
     QColor color = _helper->scrollBarHandleColor(palette, mouseOver, hasFocus, sunken, opacity, mode);
-    if (mouseOver)
-        opacity = 1;
-    else
-        opacity = 0;
+//     if (mouseOver)
+//         opacity = 1;
+//     else
+//         opacity = 0;
+    opacity = 1; // The hover-only scrollbar appearance is too janky for LibreOffice to cope with rn
 
     /*
     if( horizontal ) handleRect = centerRect( rect, rect.width(), rect.height() * (0.5 + 0.5 * opacity));
