@@ -263,13 +263,15 @@ QColor Helper::scrollBarHandleColor(const QPalette &palette, bool mouseOver, boo
     QColor selectedBgColor = palette.color(QPalette::Highlight);
 
     //QColor color(mix(fgColor, bgColor, 0.4));
-    QColor color(Qt::transparent);
-    QColor activeColor(selectedBgColor);
+    // The hover-only scrollbar appearance is too janky for LibreOffice to cope with rn
+//     QColor color(Qt::transparent);
+//     QColor activeColor(selectedBgColor);
+    QColor color(selectedBgColor);
 
-    // hover takes precedence over focus
-    if (sunken || (mode == AnimationPressed) || (mode == AnimationHover) || mouseOver) {
-        color = activeColor;
-    }
+//     // hover takes precedence over focus
+//     if (sunken || (mode == AnimationPressed) || (mode == AnimationHover) || mouseOver) {
+//         color = activeColor;
+//     }
 
     return color;
 }
