@@ -9,7 +9,7 @@ find_package(KF5 REQUIRED COMPONENTS
     WindowSystem)
 
 find_package(Qt5 COMPONENTS Quick)
-set(FEREN_HAVE_QTQUICK ${Qt5Quick_FOUND})
+set(INSPIRE_HAVE_QTQUICK ${Qt5Quick_FOUND})
 
 find_package( KF5FrameworkIntegration CONFIG )
 set_package_properties(KF5FrameworkIntegration PROPERTIES
@@ -18,7 +18,7 @@ set_package_properties(KF5FrameworkIntegration PROPERTIES
     TYPE OPTIONAL
     PURPOSE "Required to use KStyle convenience functionalities in style")
 
-set(FEREN_HAVE_KSTYLE ${KF5FrameworkIntegration_FOUND})
+set(INSPIRE_HAVE_KSTYLE ${KF5FrameworkIntegration_FOUND})
 
 find_package(XCB COMPONENTS XCB)
 set_package_properties(XCB PROPERTIES
@@ -29,54 +29,53 @@ set_package_properties(XCB PROPERTIES
 )
 
 find_package(KF5Wayland CONFIG)
-set(FEREN_HAVE_KWAYLAND ${KF5Wayland_FOUND})
+set(INSPIRE_HAVE_KWAYLAND ${KF5Wayland_FOUND})
 
 if(UNIX AND NOT APPLE)
-    set(FEREN_HAVE_X11 ${XCB_XCB_FOUND})
+    set(INSPIRE_HAVE_X11 ${XCB_XCB_FOUND})
     if (XCB_XCB_FOUND)
         find_package(Qt5 REQUIRED CONFIG COMPONENTS X11Extras)
     endif()
 else()
-    set(FEREN_HAVE_X11 FALSE)
+    set(INSPIRE_HAVE_X11 FALSE)
 endif()
 
-configure_file(config-feren.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-feren.h )
+configure_file(config-inspire.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-inspire.h )
 
-set(Feren_SRCS
-    animations/ferenanimation.cpp
-    animations/ferenanimations.cpp
-    animations/ferenanimationdata.cpp
-    animations/ferenbaseengine.cpp
-    animations/ferenbusyindicatordata.cpp
-    animations/ferenbusyindicatorengine.cpp
-    animations/ferendialdata.cpp
-    animations/ferendialengine.cpp
-    animations/ferenenabledata.cpp
-    animations/ferengenericdata.cpp
-    animations/ferenheaderviewdata.cpp
-    animations/ferenheaderviewengine.cpp
-    animations/ferenscrollbardata.cpp
-    animations/ferenscrollbarengine.cpp
-    animations/ferenspinboxengine.cpp
-    animations/ferenspinboxdata.cpp
-    animations/ferenstackedwidgetdata.cpp
-    animations/ferenstackedwidgetengine.cpp
-    animations/ferentabbarengine.cpp
-    animations/ferentabbardata.cpp
-    animations/ferentoolboxengine.cpp
-    animations/ferentransitiondata.cpp
-    animations/ferentransitionwidget.cpp
-    animations/ferenwidgetstateengine.cpp
-    animations/ferenwidgetstatedata.cpp
-    debug/ferenwidgetexplorer.cpp
-    ferenaddeventfilter.cpp
-    ferenblurhelper.cpp
-    ferenhelper.cpp
-    ferenmnemonics.cpp
-    ferensplitterproxy.cpp
-    ferenstyle.cpp
-    ferenstyleplugin.cpp
-    ferenwindowmanager.cpp
+set(Inspire_SRCS
+    animations/inspireanimation.cpp
+    animations/inspireanimations.cpp
+    animations/inspireanimationdata.cpp
+    animations/inspirebaseengine.cpp
+    animations/inspirebusyindicatordata.cpp
+    animations/inspirebusyindicatorengine.cpp
+    animations/inspiredialdata.cpp
+    animations/inspiredialengine.cpp
+    animations/inspireenabledata.cpp
+    animations/inspiregenericdata.cpp
+    animations/inspireheaderviewdata.cpp
+    animations/inspireheaderviewengine.cpp
+    animations/inspirescrollbardata.cpp
+    animations/inspirescrollbarengine.cpp
+    animations/inspirespinboxengine.cpp
+    animations/inspirespinboxdata.cpp
+    animations/inspirestackedwidgetdata.cpp
+    animations/inspirestackedwidgetengine.cpp
+    animations/inspiretabbarengine.cpp
+    animations/inspiretabbardata.cpp
+    animations/inspiretoolboxengine.cpp
+    animations/inspiretransitiondata.cpp
+    animations/inspiretransitionwidget.cpp
+    animations/inspirewidgetstateengine.cpp
+    animations/inspirewidgetstatedata.cpp
+    inspireaddeventfilter.cpp
+    inspireblurhelper.cpp
+    inspirehelper.cpp
+    inspiremnemonics.cpp
+    inspiresplitterproxy.cpp
+    inspirestyle.cpp
+    inspirestyleplugin.cpp
+    inspirewindowmanager.cpp
 )
 add_definitions(-DQT_PLUGIN)
 
@@ -86,18 +85,17 @@ endif()
 
 include_directories(
     ${QT_INCLUDES}
-    ${CMAKE_CURRENT_BINARY_DIR} # for feren-config.h
+    ${CMAKE_CURRENT_BINARY_DIR} # for inspire-config.h
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/animations/
-    ${CMAKE_CURRENT_SOURCE_DIR}/debug/
 )
 
-set(LIBRARY_NAME "feren-qt${QT_VERSION_NUMBER}")
+set(LIBRARY_NAME "inspire-qt${QT_VERSION_NUMBER}")
 
-add_library(${LIBRARY_NAME} MODULE ${Feren_SRCS})
+add_library(${LIBRARY_NAME} MODULE ${Inspire_SRCS})
 target_link_libraries(${LIBRARY_NAME} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDBUS_LIBRARY})
 
-if( FEREN_HAVE_QTQUICK )
+if( INSPIRE_HAVE_QTQUICK )
     target_link_libraries(${LIBRARY_NAME} Qt5::Quick)
 endif()
 
@@ -105,12 +103,12 @@ if(KF5FrameworkIntegration_FOUND)
     target_link_libraries(${LIBRARY_NAME} KF5::Style)
 endif()
 
-if(FEREN_HAVE_X11)
+if(INSPIRE_HAVE_X11)
     target_link_libraries(${LIBRARY_NAME} ${XCB_LIBRARIES})
     target_link_libraries(${LIBRARY_NAME} Qt5::X11Extras)
 endif()
 
-if(FEREN_HAVE_KWAYLAND)
+if(INSPIRE_HAVE_KWAYLAND)
     target_link_libraries(${LIBRARY_NAME} KF5::WaylandClient)
 endif()
 
@@ -118,8 +116,8 @@ target_link_libraries(${LIBRARY_NAME} KF5::ConfigCore KF5::ConfigWidgets KF5::Gu
 set_target_properties(${LIBRARY_NAME} PROPERTIES
     LINK_FLAGS "-Wl,--no-undefined"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    OUTPUT_NAME "feren"
+    OUTPUT_NAME "inspire"
     PREFIX "")
 
 install(TARGETS ${LIBRARY_NAME} DESTINATION "${QT_PLUGINS_DIR}/styles")
-install(FILES feren.themerc  DESTINATION  ${DATA_INSTALL_DIR}/kstyle/themes)
+install(FILES inspire.themerc  DESTINATION  ${DATA_INSTALL_DIR}/kstyle/themes)

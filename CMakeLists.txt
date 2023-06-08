@@ -1,4 +1,4 @@
-project(Feren)
+project(Inspire)
 
 cmake_minimum_required(VERSION 3.0)
 
@@ -50,12 +50,7 @@ if (NOT THEME_INSTALL_DIR)
     set (THEME_INSTALL_DIR "${DATA_INSTALL_DIR}/themes")
 endif()
 
-set(FEREN_THEME_DIR "${THEME_INSTALL_DIR}/Feren/qt")
-
-option(BUILD_EXAMPLE "Build an example widget factory app" OFF)
-if (BUILD_EXAMPLE)
-    add_subdirectory(demo)
-endif()
+set(INSPIRE_THEME_DIR "${THEME_INSTALL_DIR}/Inspire/qt")
 
 add_subdirectory(style)
 
